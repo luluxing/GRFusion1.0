@@ -79,6 +79,7 @@ public interface StatementTypes {
     int DROP_CAST                        = 78;
     int DROP_ORDERING                    = 115;
     int DROP_VIEW                        = 36;
+    int DROP_GRAPHVIEW                   = 138;
 
     //VoltDB extension to support TTL
     int DROP_TTL                         = 200;
@@ -144,6 +145,7 @@ public interface StatementTypes {
     int CREATE_TYPE                      = 83;
     int CREATE_ORDERING                  = 114;
     int CREATE_VIEW                      = 84;
+    int CREATE_GRAPHVIEW                 = 137;
     int ASSIGNMENT                       = 5;     // PSM
     int CASE                             = 86;
     int BEGIN_END                        = 12;

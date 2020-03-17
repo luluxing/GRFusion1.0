@@ -1831,11 +1831,16 @@ public class Session implements SessionInterface {
         return currentSchema;
     }
 
-// session tables
+    // session tables
     Table[] transitionTables = Table.emptyArray;
-
+    // session graphs
+    GraphView[] transitionGraphs = GraphView.emptyArray;
     public void setSessionTables(Table[] tables) {
         transitionTables = tables;
+    }
+
+    public void setSessiongraphs(GraphView[] graphs) {
+        transitionGraphs = graphs;
     }
 
     public Table findSessionTable(String name) {
@@ -1891,6 +1896,17 @@ public class Session implements SessionInterface {
 	public void clearLocalTables() {
 		localTables = new HashMap<>();
 	}
+
+    public GraphView findSessionGraph(String name) {
+
+        for (int i = 0; i < transitionGraphs.length; i++) {
+            if (name.equals(transitionGraphs[i].getName().name)) {
+                return transitionGraphs[i];
+            }
+        }
+
+        return null;
+    }
 
     public int getResultMemoryRowCount() {
         return resultMaxMemoryRows;

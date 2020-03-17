@@ -401,6 +401,47 @@ public class SchemaManager {
         return temp.tableList;
     }
 
+        public HashMappedList getGraphs(String schema) {
+
+        Schema temp = (Schema) schemaMap.get(schema);
+
+        return temp.graphviewList;
+    }
+    
+    /**
+     *  Returns the specified user-defined graph visible within the
+     *  context of the specified Session. It excludes any graphs created in other Sessions.
+     *  Throws if the graph does not exist in the context.
+     */
+    public GraphView getGraph(Session session, String name, String schema, int tokenType) {
+
+        GraphView g = null;
+        
+        if (schema == null) {
+            g = findSessionGraph(session, name, schema);
+        }
+
+        if (g == null) {
+            schema = session.getSchemaName(schema);
+            g      = findUserGraph(session, name, schema);
+        }
+
+        if (g == null) {
+            throw Error.error(ErrorCode.X_42501, name);
+        }
+
+        /*
+        if (tokenType == Tokens.VERTEXES) 
+            g.focusVertexes = true;
+        else if (tokenType == Tokens.EDGES)
+            g.focusEdges = true;
+        else if (tokenType == Tokens.PATHS)
+            g.focusPaths = true;
+        */
+        
+        return g;
+    }
+
     SchemaObjectSet getSchemaObjectSet(Schema schema, int type) {
 
         SchemaObjectSet set = null;
@@ -414,6 +455,10 @@ public class SchemaManager {
             case SchemaObject.TABLE :
             case SchemaObject.VIEW :
                 set = schema.tableLookup;
+                break;
+
+            case SchemaObject.GRAPHVIEW :
+                set = schema.graphviewLookup;
                 break;
 
             case SchemaObject.CHARSET :
@@ -552,6 +597,14 @@ public class SchemaManager {
     public Table findSessionTable(Session session, String name,
                                   String schemaName) {
         return session.findSessionTable(name);
+    }
+
+    /**
+     *  Returns the specified session context graph.
+     *  Returns null if the graph does not exist in the context.
+     */
+    public GraphView findSessionGraph(Session session, String name, String schemaName){
+        return session.findSessionGraph(name);
     }
 
     /**
@@ -870,7 +923,11 @@ public class SchemaManager {
 
             case SchemaObject.TABLE :
             case SchemaObject.VIEW :
-                return schema.sequenceLookup.getObject(name);
+                // return schema.sequenceLookup.getObject(name);
+                return schema.tableLookup.getObject(name);
+
+            case SchemaObject.GRAPHVIEW :
+                return schema.graphviewLookup.getObject(name);
 
             case SchemaObject.CHARSET :
                 if (name.equals("SQL_IDENTIFIER")) {
@@ -1409,6 +1466,12 @@ public class SchemaManager {
 
                 break;
             }
+            case SchemaObject.GRAPHVIEW : {
+                set    = schema.graphviewLookup;
+                object = set.getObject(name.name);
+                set.remove(name.name);
+                break;
+            }
             case SchemaObject.CHARSET :
                 set    = schema.charsetLookup;
                 object = set.getObject(name.name);
@@ -1651,6 +1714,34 @@ public class SchemaManager {
             return defaultName;
         }
         return schema.name;
+    }
+
+        /**
+     *  Returns the specified user-defined graph visible within the
+     *  context of the specified schema.
+     *  Returns null if the graph does not exist in the context.
+     */
+    public GraphView findUserGraph(Session session, String name, String schemaName) {
+        Schema schema = (Schema) schemaMap.get(schemaName);
+
+        if (schema == null) {
+            return null;
+        }
+
+        int i = schema.graphviewList.getIndex(name);
+
+        if (i == -1) {
+            return null;
+        }
+
+        return (GraphView) schema.graphviewList.get(i);
+    }
+
+    public void dropGraph(Session session, GraphView graph, boolean cascade) {
+
+        session.commit(false);
+
+        removeSchemaObject(graph.getName(), cascade);
     }
 
     /**********************************************************************/
