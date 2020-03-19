@@ -68,8 +68,8 @@ public interface SchemaObject {
     int VARIABLE   = 22;
     int PARAMETER  = 23;
     // A VoltDB extension to support graphs // tkuznets 10/05/16
-    int GRAPHVIEW  = 24;
-    int PROPERTY  = 25;
+    int GRAPHVIEW  = 24; // Added by LX
+    int PROPERTY  = 25; // Added by LX
 
     //
     SchemaObject[] emptyArray = new SchemaObject[]{};

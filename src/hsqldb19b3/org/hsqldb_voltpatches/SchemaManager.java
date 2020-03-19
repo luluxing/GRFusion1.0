@@ -401,7 +401,8 @@ public class SchemaManager {
         return temp.tableList;
     }
 
-        public HashMappedList getGraphs(String schema) {
+    // Added by LX
+    public HashMappedList getGraphs(String schema) {
 
         Schema temp = (Schema) schemaMap.get(schema);
 
@@ -413,6 +414,7 @@ public class SchemaManager {
      *  context of the specified Session. It excludes any graphs created in other Sessions.
      *  Throws if the graph does not exist in the context.
      */
+    // Added by LX
     public GraphView getGraph(Session session, String name, String schema, int tokenType) {
 
         GraphView g = null;
@@ -457,6 +459,7 @@ public class SchemaManager {
                 set = schema.tableLookup;
                 break;
 
+            // Added by LX
             case SchemaObject.GRAPHVIEW :
                 set = schema.graphviewLookup;
                 break;
@@ -603,6 +606,7 @@ public class SchemaManager {
      *  Returns the specified session context graph.
      *  Returns null if the graph does not exist in the context.
      */
+    // Added by LX
     public GraphView findSessionGraph(Session session, String name, String schemaName){
         return session.findSessionGraph(name);
     }
@@ -923,9 +927,11 @@ public class SchemaManager {
 
             case SchemaObject.TABLE :
             case SchemaObject.VIEW :
+                // Added by LX
                 // return schema.sequenceLookup.getObject(name);
                 return schema.tableLookup.getObject(name);
 
+            // Added by LX
             case SchemaObject.GRAPHVIEW :
                 return schema.graphviewLookup.getObject(name);
 
@@ -1466,6 +1472,7 @@ public class SchemaManager {
 
                 break;
             }
+            // Added by LX
             case SchemaObject.GRAPHVIEW : {
                 set    = schema.graphviewLookup;
                 object = set.getObject(name.name);
@@ -1721,6 +1728,7 @@ public class SchemaManager {
      *  context of the specified schema.
      *  Returns null if the graph does not exist in the context.
      */
+    // Added by LX
     public GraphView findUserGraph(Session session, String name, String schemaName) {
         Schema schema = (Schema) schemaMap.get(schemaName);
 

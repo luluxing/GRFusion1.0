@@ -46,6 +46,7 @@ public class HSQLLexer extends SQLPatternFactory
                     SPF.capture("subject", SPF.databaseObjectName())))
         ).compile("HSQL_DDL_PREPROCESSOR");
 
+    // Added by LX
     private static final Pattern HSQL_DDLGRAPH_PREPROCESSOR =
         SPF.statementLeader(
             SPF.capture("verb", SPF.tokenAlternatives("create", "drop", "alter")),
@@ -74,20 +75,27 @@ public class HSQLLexer extends SQLPatternFactory
     public static HSQLDDLInfo preprocessHSQLDDL(String ddl) {
         ddl = SQLLexer.stripComments(ddl);
 
+        // Commented by LX
         // Matcher matcher = HSQL_DDL_PREPROCESSOR.matcher(ddl);
         // if (matcher.find()) {
         //org.voltdb.VLog.GLog("HSQLLexer", "preprocessHSQLDDL", 668, 
         //      "HSQL_DDLGRAPH_PREPROCESSOR is called");
         
+        // Added by LX
         Matcher matcher = HSQL_DDLGRAPH_PREPROCESSOR.matcher(ddl);
         boolean found = matcher.find(); 
         
+        // Added by LX
         if (!found) {
             matcher = HSQL_DDL_PREPROCESSOR.matcher(ddl);
             found = matcher.find(); 
         }
         
+        // Added by LX
         if (found) {
+            // Commented by LX
+            // Matcher matcher = HSQL_DDL_PREPROCESSOR.matcher(ddl);
+            // if (matcher.find()) {
             String verbString = matcher.group("verb");
             HSQLDDLInfo.Verb verb = HSQLDDLInfo.Verb.get(verbString);
             if (verb == null) {

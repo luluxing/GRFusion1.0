@@ -49,7 +49,7 @@ import org.hsqldb_voltpatches.rights.User;
 import org.hsqldb_voltpatches.types.Charset;
 import org.hsqldb_voltpatches.types.Type;
 import org.hsqldb_voltpatches.types.UserTypeModifier;
-import org.hsqldb_voltpatches.HSQLInterface.HSQLParseException;
+import org.hsqldb_voltpatches.HSQLInterface.HSQLParseException;// Added by LX
 
 /**
  * Parser for DDL statements
@@ -84,7 +84,7 @@ public class ParserDDL extends ParserRoutine {
         int     tableType = TableBase.MEMORY_TABLE;
         boolean isTable   = false;
         boolean isStream   = false;
-        boolean isGraph    = false;
+        boolean isGraph    = false;//Added by LX
 
         read();
 
@@ -147,6 +147,7 @@ public class ParserDDL extends ParserRoutine {
                 break;
 
             // A GVoltDB extension to support the Graph // tkuznets 10/05/16
+            // Added by LX
             case Tokens.UNDIRECTED :
                 read();
                 readThis(Tokens.GRAPH);
@@ -155,7 +156,7 @@ public class ParserDDL extends ParserRoutine {
                 isGraph   = true;
                 tableType = TableBase.UNDIRECTED_GRAPH;
                 break;
-                
+            // Added by LX  
             case Tokens.DIRECTED :
                 read();
                 readThis(Tokens.GRAPH);
@@ -164,7 +165,7 @@ public class ParserDDL extends ParserRoutine {
                 isGraph   = true;
                 tableType = TableBase.DIRECTED_GRAPH;
                 break;
-                
+            // Added by LX  
             case Tokens.GRAPH :
                 read();
                 readThis(Tokens.VIEW);
@@ -193,6 +194,7 @@ public class ParserDDL extends ParserRoutine {
             return compileCreateStream(tableType);
         }
 
+        // Added by LX
         if (isGraph) {
             System.out.println("graph view");
             tableType = database.schemaManager.getDefaultTableType();
@@ -277,6 +279,7 @@ public class ParserDDL extends ParserRoutine {
         }
     }
     
+    // Added by LX    
     // @LuTODO: uncomment this function later
     // private StatementSchema compileCreateGraph(int type) {
     // // TODO
@@ -767,6 +770,7 @@ public class ParserDDL extends ParserRoutine {
                 useIfExists   = true;
                 break;
 
+            // Added by LX
             case Tokens.GRAPH :
                 read();
                 readThis(Tokens.VIEW);

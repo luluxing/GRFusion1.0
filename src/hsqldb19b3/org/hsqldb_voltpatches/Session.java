@@ -1833,12 +1833,13 @@ public class Session implements SessionInterface {
 
     // session tables
     Table[] transitionTables = Table.emptyArray;
-    // session graphs
-    GraphView[] transitionGraphs = GraphView.emptyArray;
+    // session graphs 
+    GraphView[] transitionGraphs = GraphView.emptyArray;// Added by LX
     public void setSessionTables(Table[] tables) {
         transitionTables = tables;
     }
 
+    // Added by LX
     public void setSessiongraphs(GraphView[] graphs) {
         transitionGraphs = graphs;
     }
@@ -1897,6 +1898,7 @@ public class Session implements SessionInterface {
 		localTables = new HashMap<>();
 	}
 
+    // Added by LX
     public GraphView findSessionGraph(String name) {
 
         for (int i = 0; i < transitionGraphs.length; i++) {

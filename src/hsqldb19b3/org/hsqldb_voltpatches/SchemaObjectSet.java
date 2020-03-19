@@ -60,7 +60,7 @@ public class SchemaObjectSet {
 
             case SchemaObject.VIEW :
             case SchemaObject.TABLE :
-            case SchemaObject.GRAPHVIEW :
+            case SchemaObject.GRAPHVIEW :// Added by LX
             case SchemaObject.SEQUENCE :
             case SchemaObject.CHARSET :
             case SchemaObject.DOMAIN :
@@ -86,7 +86,7 @@ public class SchemaObjectSet {
 
             case SchemaObject.VIEW :
             case SchemaObject.TABLE :
-            case SchemaObject.GRAPHVIEW :
+            case SchemaObject.GRAPHVIEW :// Added by LX
             case SchemaObject.SEQUENCE :
             case SchemaObject.CHARSET :
             case SchemaObject.DOMAIN :
@@ -116,7 +116,7 @@ public class SchemaObjectSet {
 
             case SchemaObject.VIEW :
             case SchemaObject.TABLE :
-            case SchemaObject.GRAPHVIEW :
+            case SchemaObject.GRAPHVIEW :// Added by LX
             case SchemaObject.SEQUENCE :
             case SchemaObject.CHARSET :
             case SchemaObject.DOMAIN :
@@ -214,7 +214,7 @@ public class SchemaObjectSet {
 
             case SchemaObject.VIEW :
             case SchemaObject.TABLE :
-            case SchemaObject.GRAPHVIEW :
+            case SchemaObject.GRAPHVIEW :// Added by LX
             case SchemaObject.SEQUENCE :
             case SchemaObject.CHARSET :
             case SchemaObject.COLLATION :
@@ -259,7 +259,7 @@ public class SchemaObjectSet {
 
             case SchemaObject.VIEW :
             case SchemaObject.TABLE :
-            case SchemaObject.GRAPHVIEW :
+            case SchemaObject.GRAPHVIEW : // Added by LX
             case SchemaObject.SEQUENCE :
             case SchemaObject.CHARSET :
             case SchemaObject.DOMAIN :
@@ -289,7 +289,7 @@ public class SchemaObjectSet {
 
             case SchemaObject.VIEW :
             case SchemaObject.TABLE :
-            case SchemaObject.GRAPHVIEW :
+            case SchemaObject.GRAPHVIEW :// Added by LX
             case SchemaObject.SEQUENCE :
             case SchemaObject.CHARSET :
             case SchemaObject.DOMAIN :
@@ -321,6 +321,7 @@ public class SchemaObjectSet {
             case SchemaObject.TABLE :
                 return Tokens.T_TABLE;
 
+            // Added by LX
             case SchemaObject.GRAPHVIEW :
                 return Tokens.T_GRAPH;
 

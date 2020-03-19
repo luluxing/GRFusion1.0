@@ -137,7 +137,7 @@ public class StatementSchema extends Statement {
             case StatementTypes.DROP_INDEX :
             case StatementTypes.DROP_CONSTRAINT :
             case StatementTypes.DROP_COLUMN :
-            case StatementTypes.DROP_GRAPHVIEW :
+            case StatementTypes.DROP_GRAPHVIEW :// Added by LX
             case StatementTypes.DROP_TTL:
                 group = StatementTypes.X_SQL_SCHEMA_MANIPULATION;
                 break;
@@ -217,6 +217,7 @@ public class StatementSchema extends Statement {
                 break;
 
             // GVoltDB extension
+            // Added by LX
             case StatementTypes.CREATE_GRAPHVIEW :
                 group = StatementTypes.X_SQL_SCHEMA_DEFINITION;
                 order = 6;
@@ -493,7 +494,7 @@ public class StatementSchema extends Statement {
             case StatementTypes.DROP_CAST :
             case StatementTypes.DROP_ORDERING :
             case StatementTypes.DROP_VIEW :
-            case StatementTypes.DROP_GRAPHVIEW : // GVoltDB extension
+            case StatementTypes.DROP_GRAPHVIEW : // GVoltDB extension Added by LX
             case StatementTypes.DROP_INDEX :
             case StatementTypes.DROP_CONSTRAINT : {
                 try {
@@ -596,6 +597,7 @@ public class StatementSchema extends Statement {
                             dropTable(session, name, cascade);
                             break;
 
+                        // Added by LX
                         case StatementTypes.DROP_GRAPHVIEW :
                             dropGraph(session, name, cascade);
                             break;
@@ -627,6 +629,7 @@ public class StatementSchema extends Statement {
                 }
             }
             // GVoltDB graph extension
+            // Added by LX
             case StatementTypes.CREATE_GRAPHVIEW : {
                 GraphView graph = (GraphView) arguments[0];
     
@@ -1075,6 +1078,7 @@ public class StatementSchema extends Statement {
         return Result.updateZeroResult;
     }
 
+    // Added by LX
     private void dropGraph(Session session, HsqlName name, boolean cascade) {
         GraphView graph = session.database.schemaManager.findUserGraph(session, name.name, name.schema.name);
          session.database.schemaManager.dropGraph(session, graph, cascade);

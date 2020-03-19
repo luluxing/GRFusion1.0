@@ -77,7 +77,7 @@ public class SQLLexer extends SQLPatternFactory
     private final static ObjectToken[] OBJECT_TOKENS = {
         // Rename-able objects
         new ObjectToken("table", true),
-        new ObjectToken("graph", true),
+        new ObjectToken("graph", true),// Add by LX
         new ObjectToken("stream", true),
         new ObjectToken("column", true),
         new ObjectToken("index", true),
@@ -90,7 +90,9 @@ public class SQLLexer extends SQLPatternFactory
     };
 
     private final static String[] MODIFIER_TOKENS = {
+        // Commented by LX
         // "assumeunique", "unique", "migrating", "aggregate"
+        // Added by LX
         "assumeunique", "unique", "directed", "undirected"
     };
 
@@ -124,9 +126,14 @@ public class SQLLexer extends SQLPatternFactory
     private static final Pattern PAT_TABLE_DDL_PREAMBLE =
         SPF.statementLeader(
             SPF.capture(SPF.tokenAlternatives("create", "drop")),   // DDL commands we're looking for
+            // Commented by LX
             // SPF.tokenAlternatives("table", "stream"),               // target is table or stream
+            // Added by LX
             SPF.tokenAlternatives("table", "stream", "graph"),               // target is table or stream
+            // Commented by LX
             //SPF.optional(SPF.capture(SPF.tokenAlternatives("view"))),   // for "GRAPH VIEW" statement
+            // Delete by LX
+            SPF.tokenAlternatives("table", "stream"),               // target is table or stream
             SPF.capture(SPF.databaseObjectName())                   // table name (captured)
         ).compile("PAT_TABLE_DDL_PREAMBLE");
 
