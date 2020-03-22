@@ -60,11 +60,16 @@ public class ExpressionColumn extends Expression {
     String        tableName;
     String        columnName;
     RangeVariable rangeVariable;
+    // Added by LX
+    String        objectName;
+    int           objectIdx = -1; //id of edge/vertex in the ordered list of edges/vertexes in the path,e.g. Edge[0], Vertex[2]
+    int           columnIndex0 = -1;
 
     //
     NumberSequence sequence;
     boolean        isWritable;    // = false; true if column of writable table
 
+    // Added by LX
     /**
      * Creates a OpCodes.COLUMN expression
      */
@@ -74,6 +79,19 @@ public class ExpressionColumn extends Expression {
         tableName   = table;
         columnName  = column;
     }
+
+    /**
+     * Creates a OpCodes.COLUMN expression
+     */
+    ExpressionColumn(String schema, String table, String object, String column, int objIdx) {
+        super(OpTypes.COLUMN);
+        this.schema = schema;
+        tableName   = table;
+        columnName  = column;
+        objectName  = object;
+        objectIdx   = objIdx;
+    }
+    
 
     ExpressionColumn(ColumnSchema column) {
         super(OpTypes.COLUMN);
@@ -152,12 +170,34 @@ public class ExpressionColumn extends Expression {
         }
 
         columnName  = column.getName().name;
-        Table table = range.getTable();
-        tableName   = table.getName().name;
-        schema      = table.getSchemaName().name;
+        // Commented by LX
+        // Table table = range.getTable();
+        // tableName   = table.getName().name;
+        // schema      = table.getSchemaName().name;
+
+        // Added by LX
+        if (range.isGraph) {
+            GraphView graph = range.getGraph();
+            tableName   = graph.getName().name;
+            schema      = graph.getSchemaName().name;
+            columnIndex0 = graph.getPropIndex0(columnIndex);
+        } else {
+            Table table = range.getTable();
+            tableName   = table.getName().name;
+            schema      = table.getSchemaName().name;
+        }
+        
+        if (objectName == null)
+            if (range.isPaths) objectName = "PATHS";
+            else if (range.isVertexes) objectName = "VERTEXES";
+            else if (range.isEdges) objectName = "EDGES";
+
         if (alias == null && rangeVariable.hasColumnAliases()) {
             alias = rangeVariable.getColumnAliasName(index);
         }
+        //org.voltdb.VLog.GLog("ExpressionColumn", "setAttributesAsColumn", 179, 
+        //     "column = " + columnName+" index = "+columnIndex);
+ 
         rangeVariable.addColumn(columnIndex);
     }
 
@@ -283,6 +323,11 @@ public class ExpressionColumn extends Expression {
     @Override
     ColumnSchema getColumn() {
         return column;
+    }
+
+    // Added by LX
+    String getObjectName() {
+        return objectName;
     }
 
     String getSchemaName() {
@@ -546,7 +591,15 @@ public class ExpressionColumn extends Expression {
             return null;
         }
 
-        int colIndex = rangeVar.findColumn(tableName, columnName);
+        // Commented by LX
+        // int colIndex = rangeVar.findColumn(tableName, columnName);
+        // Added by LX
+        int colIndex;
+        if (objectName != null) {
+            colIndex = rangeVar.findColumn(tableName, objectName, columnName);
+        }
+        else colIndex = rangeVar.findColumn(tableName, columnName);
+
         if (colIndex == -1) {
             return null;
         }
@@ -1331,6 +1384,26 @@ public class ExpressionColumn extends Expression {
                 exp.attributes.put("table", tableName.toUpperCase());
             }
         }
+
+        if (rangeVariable != null && rangeVariable.isGraph) {
+            //if (objectName == null)
+                //System.out.println("ExpressionColumn ln 1332: "+columnName);
+            if (columnName.toUpperCase() == "STARTVERTEXID")
+                exp.attributes.put("propertytype", "startvertex");
+            else if (columnName.toUpperCase() == "ENDVERTEXID")
+                exp.attributes.put("propertytype", "endvertex");
+            else if ((objectName == null && rangeVariable.isVertexes) || "VERTEXES".equals(objectName))
+                exp.attributes.put("propertytype", "vertex");
+            else if ((objectName == null && rangeVariable.isEdges) || "EDGES".equals(objectName))
+                exp.attributes.put("propertytype", "edge");
+            else if ((objectName == null && rangeVariable.isPaths) || "PATHS".equals(objectName))
+                exp.attributes.put("propertytype", "path");
+            else exp.attributes.put("propertytype", "column");
+        }
+        else exp.attributes.put("propertytype", "column");
+        
+        if (objectIdx != -1) exp.attributes.put("propertytypeidx", Integer.toString(objectIdx));
+
         exp.attributes.put("column", columnName.toUpperCase());
         if ((alias == null) || (getAlias().length() == 0)) {
             exp.attributes.put("alias", columnName.toUpperCase());
@@ -1339,6 +1412,7 @@ public class ExpressionColumn extends Expression {
             exp.attributes.put("tablealias",  rangeVariable.tableAlias.name.toUpperCase());
         }
         exp.attributes.put("index", Integer.toString(columnIndex));
+        exp.attributes.put("index0", Integer.toString(columnIndex0));
         return exp;
     }
     /**********************************************************************/

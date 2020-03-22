@@ -197,9 +197,8 @@ public class ParserDDL extends ParserRoutine {
         // Added by LX
         if (isGraph) {
             System.out.println("graph view");
-            tableType = database.schemaManager.getDefaultTableType();
-            return compileCreateTable(tableType);// @LuTODO: modify later
-            // return compileCreateGraph(tableType);
+            // return compileCreateTable(tableType);// @LuTODO: modify later
+            return compileCreateGraph(tableType);
         }
 
         // A VoltDB extension to support the assume unique attribute
@@ -280,252 +279,251 @@ public class ParserDDL extends ParserRoutine {
     }
     
     // Added by LX    
-    // @LuTODO: uncomment this function later
-    // private StatementSchema compileCreateGraph(int type) {
-    // // TODO
-    //     HsqlName schema = readNewSchemaObjectNameNoCheck(SchemaObject.GRAPHVIEW);
-    //     //HsqlArrayList tempConstraints = new HsqlArrayList();
+    private StatementSchema compileCreateGraph(int type) {
+    // TODO
+        HsqlName schema = readNewSchemaObjectNameNoCheck(SchemaObject.GRAPHVIEW);
+        //HsqlArrayList tempConstraints = new HsqlArrayList();
 
-    //     schema.setSchemaIfNull(session.getCurrentSchemaHsqlName());
+        schema.setSchemaIfNull(session.getCurrentSchemaHsqlName());
 
-    //     GraphView graph = new GraphView(database, schema, type);
-    //     graph.setSQL(session.parser.getScanner().sqlString);
+        GraphView graph = new GraphView(database, schema, type);
+        graph.setSQL(session.parser.getScanner().sqlString);
 
-    //     readThis(Tokens.VERTEXES);
+        readThis(Tokens.VERTEXES);
         
-    //     //Vertex vertex = new VetrexSchema(graph);
+        //Vertex vertex = new VetrexSchema(graph);
         
-    //     readThis(Tokens.OPENBRACKET);
+        readThis(Tokens.OPENBRACKET);
         
-    //     HsqlName propName;
-    //     HsqlName colName;
+        HsqlName propName;
+        HsqlName colName;
         
-    //     //boolean start     = true;
-    //     //boolean startPart = true;
-    //     boolean end       = false;
-    //     ArrayList<HsqlName> props = new ArrayList<HsqlName>();
-    //     ArrayList<HsqlName> cols = new ArrayList<HsqlName>();
+        //boolean start     = true;
+        //boolean startPart = true;
+        boolean end       = false;
+        ArrayList<HsqlName> props = new ArrayList<HsqlName>();
+        ArrayList<HsqlName> cols = new ArrayList<HsqlName>();
         
-    //     // Add Def Path Properties
-    //     graph.addDefPathProps(schema, isDelimitedIdentifier());
+        // Add Def Path Properties
+        graph.addDefPathProps(schema, isDelimitedIdentifier());
         
-    //     // Rear ID property
-    //     readThis(Tokens.ID);
-    //     propName = database.nameManager.newColumnHsqlName(schema, "ID", isDelimitedIdentifier());
-    //     props.add(propName);        
-    //     readThis(Tokens.EQUALS);        
-    //     colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());       
-    //     cols.add(colName);
-    //     read();
+        // Rear ID property
+        readThis(Tokens.ID);
+        propName = database.nameManager.newColumnHsqlName(schema, "ID", isDelimitedIdentifier());
+        props.add(propName);        
+        readThis(Tokens.EQUALS);        
+        colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());       
+        cols.add(colName);
+        read();
         
-    //     // Read other propertires
-    //     while (!end) {
-    //         switch (token.tokenType) {
+        // Read other propertires
+        while (!end) {
+            switch (token.tokenType) {
 
-    //             case Tokens.COMMA :
-    //                 //if (startPart) {
-    //                 //    throw unexpectedToken();
-    //                 //}
+                case Tokens.COMMA :
+                    //if (startPart) {
+                    //    throw unexpectedToken();
+                    //}
 
-    //                 read();
+                    read();
 
-    //                 //startPart = true;
-    //                 break;
+                    //startPart = true;
+                    break;
 
-    //             case Tokens.CLOSEBRACKET :
-    //                 read();
+                case Tokens.CLOSEBRACKET :
+                    read();
 
-    //                 end = true;
-    //                 break;
+                    end = true;
+                    break;
                     
-    //             default :
-    //                 //if (!startPart) {
-    //                 //    throw unexpectedToken();
-    //                 //}
+                default :
+                    //if (!startPart) {
+                    //    throw unexpectedToken();
+                    //}
 
-    //                 propName =
-    //                         database.nameManager.newColumnHsqlName(schema,
-    //                                 token.tokenString, isDelimitedIdentifier());
-    //                 props.add(propName);
-    //                 read();
-    //                 readThis(Tokens.EQUALS);
+                    propName =
+                            database.nameManager.newColumnHsqlName(schema,
+                                    token.tokenString, isDelimitedIdentifier());
+                    props.add(propName);
+                    read();
+                    readThis(Tokens.EQUALS);
                     
-    //                 colName =
-    //                         database.nameManager.newColumnHsqlName(schema,
-    //                             token.tokenString, isDelimitedIdentifier());
+                    colName =
+                            database.nameManager.newColumnHsqlName(schema,
+                                token.tokenString, isDelimitedIdentifier());
                     
-    //                 cols.add(colName);
-    //                 read();
-    //                 //start     = false;
-    //                 //startPart = false;
-    //         }
-    //     }
-    //     /*
-    //     graph.VertexProperties = new HsqlName[props.size()];
-    //     graph.VertexColumns =  new HsqlName[cols.size()];
-    //     for (int i = 0; i < props.size(); i++) {
-    //         graph.VertexProperties[i] = props.get(i);
-    //         graph.VertexColumns[i] = cols.get(i);
-    //     }
-    //     */
+                    cols.add(colName);
+                    read();
+                    //start     = false;
+                    //startPart = false;
+            }
+        }
+        /*
+        graph.VertexProperties = new HsqlName[props.size()];
+        graph.VertexColumns =  new HsqlName[cols.size()];
+        for (int i = 0; i < props.size(); i++) {
+            graph.VertexProperties[i] = props.get(i);
+            graph.VertexColumns[i] = cols.get(i);
+        }
+        */
         
-    //     int position = getPosition();
+        int position = getPosition();
         
-    //     QuerySpecification selectVertices = new QuerySpecification(compileContext);
-    //     // TODO NO SELECT statement in select
-    //     XreadTableExpression(selectVertices);
+        QuerySpecification selectVertices = new QuerySpecification(compileContext);
+        // TODO NO SELECT statement in select
+        XreadTableExpression(selectVertices);
         
-    //     String partsql = getLastPartAndCurrent(position);
+        String partsql = getLastPartAndCurrent(position);
         
-    //     //System.out.println(partsql);
+        //System.out.println(partsql);
         
-    //     StringBuilder br = new StringBuilder("SELECT ");
+        StringBuilder br = new StringBuilder("SELECT ");
         
-    //     // Import columns as properties from the vertex-source table
-    //     selectVertices.resolveReferences(session);
-    //     Table Vtable = selectVertices.rangeVariables[0].rangeTable;
-    //     graph.VTableName = Vtable.getName();
-    //     for (int i = 0; i < props.size(); i++) {
-    //         ColumnSchema column = Vtable.getColumn(Vtable.findColumn(cols.get(i).name)).duplicate();
-    //         column.setName(props.get(i));
-    //         graph.addVertexPropNoCheck(column);
-    //         br.append(cols.get(i).name);
-    //         if (i < props.size()-1) br.append(", ");
-    //         else br.append(" ");
-    //     }
+        // Import columns as properties from the vertex-source table
+        selectVertices.resolveReferences(session);
+        Table Vtable = selectVertices.rangeVariables[0].rangeTable;
+        graph.VTableName = Vtable.getName();
+        for (int i = 0; i < props.size(); i++) {
+            ColumnSchema column = Vtable.getColumn(Vtable.findColumn(cols.get(i).name)).duplicate();
+            column.setName(props.get(i));
+            graph.addVertexPropNoCheck(column);
+            br.append(cols.get(i).name);
+            if (i < props.size()-1) br.append(", ");
+            else br.append(" ");
+        }
         
-    //     graph.addDefVertexProps(schema, isDelimitedIdentifier());
+        graph.addDefVertexProps(schema, isDelimitedIdentifier());
         
-    //     br.append(partsql);
+        br.append(partsql);
         
-    //     //System.out.println(br);
+        //System.out.println(br);
         
-    //     graph.VSubQuery = br.toString();
-    //     //
+        graph.VSubQuery = br.toString();
+        //
         
-    //     readThis(Tokens.EDGES);
-    //     readThis(Tokens.OPENBRACKET);
+        readThis(Tokens.EDGES);
+        readThis(Tokens.OPENBRACKET);
         
-    //     //start     = true;
-    //     //startPart = true;
-    //     end       = false;
-    //     props = new ArrayList<HsqlName>();
-    //     cols = new ArrayList<HsqlName>();
-    //     // Read ID
-    //     readThis(Tokens.ID);
-    //     propName = database.nameManager.newColumnHsqlName(schema, "ID", isDelimitedIdentifier());
-    //     props.add(propName);        
-    //     readThis(Tokens.EQUALS);
-    //     colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());
-    //     cols.add(colName);
-    //     read();
-    //     readThis(Tokens.COMMA);
-    //     // Read FROM
-    //     readThis(Tokens.FROM);
-    //     propName = database.nameManager.newColumnHsqlName(schema, "FROM", isDelimitedIdentifier());
-    //     props.add(propName);        
-    //     readThis(Tokens.EQUALS);
-    //     colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());
-    //     cols.add(colName);
-    //     read();
-    //     readThis(Tokens.COMMA);
-    //     // Read TO
-    //     readThis(Tokens.TO);
-    //     propName = database.nameManager.newColumnHsqlName(schema, "TO", isDelimitedIdentifier());
-    //     props.add(propName);        
-    //     readThis(Tokens.EQUALS);
-    //     colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());
-    //     cols.add(colName);
-    //     read();
-    //     // Read others
-    //     while (!end) {
-    //         switch (token.tokenType) {
-    //             case Tokens.COMMA :
-    //                 //if (startPart) {
-    //                 //    throw unexpectedToken();
-    //                 //}
+        //start     = true;
+        //startPart = true;
+        end       = false;
+        props = new ArrayList<HsqlName>();
+        cols = new ArrayList<HsqlName>();
+        // Read ID
+        readThis(Tokens.ID);
+        propName = database.nameManager.newColumnHsqlName(schema, "ID", isDelimitedIdentifier());
+        props.add(propName);        
+        readThis(Tokens.EQUALS);
+        colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());
+        cols.add(colName);
+        read();
+        readThis(Tokens.COMMA);
+        // Read FROM
+        readThis(Tokens.FROM);
+        propName = database.nameManager.newColumnHsqlName(schema, "FROM", isDelimitedIdentifier());
+        props.add(propName);        
+        readThis(Tokens.EQUALS);
+        colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());
+        cols.add(colName);
+        read();
+        readThis(Tokens.COMMA);
+        // Read TO
+        readThis(Tokens.TO);
+        propName = database.nameManager.newColumnHsqlName(schema, "TO", isDelimitedIdentifier());
+        props.add(propName);        
+        readThis(Tokens.EQUALS);
+        colName = database.nameManager.newColumnHsqlName(schema, token.tokenString, isDelimitedIdentifier());
+        cols.add(colName);
+        read();
+        // Read others
+        while (!end) {
+            switch (token.tokenType) {
+                case Tokens.COMMA :
+                    //if (startPart) {
+                    //    throw unexpectedToken();
+                    //}
 
-    //                 read();
+                    read();
 
-    //                 //startPart = true;
-    //                 break;
+                    //startPart = true;
+                    break;
 
-    //             case Tokens.CLOSEBRACKET :
-    //                 read();
+                case Tokens.CLOSEBRACKET :
+                    read();
 
-    //                 end = true;
-    //                 break;
+                    end = true;
+                    break;
                     
-    //             default :
-    //                 //if (!startPart) {
-    //                 //    throw unexpectedToken();
-    //                 //}
+                default :
+                    //if (!startPart) {
+                    //    throw unexpectedToken();
+                    //}
 
-    //                 propName =
-    //                         database.nameManager.newColumnHsqlName(schema,
-    //                                 token.tokenString, isDelimitedIdentifier());
-    //                 props.add(propName);
-    //                 read();
-    //                 readThis(Tokens.EQUALS);
+                    propName =
+                            database.nameManager.newColumnHsqlName(schema,
+                                    token.tokenString, isDelimitedIdentifier());
+                    props.add(propName);
+                    read();
+                    readThis(Tokens.EQUALS);
                     
-    //                 colName =
-    //                         database.nameManager.newColumnHsqlName(schema,
-    //                             token.tokenString, isDelimitedIdentifier());
+                    colName =
+                            database.nameManager.newColumnHsqlName(schema,
+                                token.tokenString, isDelimitedIdentifier());
                     
-    //                 cols.add(colName);
-    //                 read();
-    //                 //start     = false;
-    //                 //startPart = false;
-    //         }
-    //     }
-    //     /*
-    //     graph.EdgeProperties = new HsqlName[props.size()];
-    //     graph.EdgeColumns =  new HsqlName[cols.size()];
-    //     for (int i = 0; i < props.size(); i++) {
-    //         graph.EdgeProperties[i] = props.get(i);
-    //         graph.EdgeColumns[i] = cols.get(i);
-    //     }
-    //     */
+                    cols.add(colName);
+                    read();
+                    //start     = false;
+                    //startPart = false;
+            }
+        }
+        /*
+        graph.EdgeProperties = new HsqlName[props.size()];
+        graph.EdgeColumns =  new HsqlName[cols.size()];
+        for (int i = 0; i < props.size(); i++) {
+            graph.EdgeProperties[i] = props.get(i);
+            graph.EdgeColumns[i] = cols.get(i);
+        }
+        */
         
-    //     position = getPosition();
+        position = getPosition();
         
-    //     QuerySpecification selectEdges = new QuerySpecification(compileContext);
-    //     // TODO NO SELECT statement in select
-    //     XreadTableExpression(selectEdges);
+        QuerySpecification selectEdges = new QuerySpecification(compileContext);
+        // TODO NO SELECT statement in select
+        XreadTableExpression(selectEdges);
 
-    //     partsql = getLastPartAndCurrent(position);
+        partsql = getLastPartAndCurrent(position);
         
-    //     //System.out.println(partsql);
+        //System.out.println(partsql);
         
-    //     br = new StringBuilder("SELECT ");
+        br = new StringBuilder("SELECT ");
         
-    //     // Import columns as properties from the edges-source table
-    //     selectEdges.resolveReferences(session);
-    //     Table Etable = selectEdges.rangeVariables[0].rangeTable;
-    //     graph.ETableName = Etable.getName();
-    //     for (int i = 0; i < props.size(); i++) {
-    //         ColumnSchema column = Etable.getColumn(Etable.findColumn(cols.get(i).name)).duplicate();
-    //         column.setName(props.get(i));
-    //         graph.addEdgePropNoCheck(column);
-    //         br.append(cols.get(i).name);
-    //         if (i < props.size()-1) br.append(", ");
-    //         else br.append(" ");
-    //     }
+        // Import columns as properties from the edges-source table
+        selectEdges.resolveReferences(session);
+        Table Etable = selectEdges.rangeVariables[0].rangeTable;
+        graph.ETableName = Etable.getName();
+        for (int i = 0; i < props.size(); i++) {
+            ColumnSchema column = Etable.getColumn(Etable.findColumn(cols.get(i).name)).duplicate();
+            column.setName(props.get(i));
+            graph.addEdgePropNoCheck(column);
+            br.append(cols.get(i).name);
+            if (i < props.size()-1) br.append(", ");
+            else br.append(" ");
+        }
         
-    //     br.append(partsql);
+        br.append(partsql);
         
-    //     //System.out.println(br);
+        //System.out.println(br);
         
-    //     graph.ESubQuery = br.toString();
-    //     //
+        graph.ESubQuery = br.toString();
+        //
         
-    //     String   sql  = getLastPart();
-    //     Object[] args = new Object[] { graph };
+        String   sql  = getLastPart();
+        Object[] args = new Object[] { graph };
 
-    //     return new StatementSchema(sql, StatementTypes.CREATE_GRAPHVIEW, args,
-    //                                    null, null);
+        return new StatementSchema(sql, StatementTypes.CREATE_GRAPHVIEW, args,
+                                       null, null);
         
-    // }
+    }
 
     void processAlter() {
 

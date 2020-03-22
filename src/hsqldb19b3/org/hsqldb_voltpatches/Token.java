@@ -41,6 +41,7 @@ public class Token {
     Object  tokenValue;
     String  namePrefix;
     String  namePrePrefix;
+    String  namePrefixInfo; // GVoltDB If we have P.Edge[0].Prop, then Edge should be Prefix and [0] is PrefixInfo Added by LX
     String  charsetSchema;
     String  charsetName;
     String  fullString;
@@ -67,6 +68,7 @@ public class Token {
         tokenValue               = null;
         namePrefix               = null;
         namePrePrefix            = null;
+        namePrefixInfo           = null;//Added by LX
         charsetSchema            = null;
         charsetName              = null;
          fullString              = null;
@@ -92,6 +94,7 @@ public class Token {
         token.tokenValue               = tokenValue;
         token.namePrefix               = namePrefix;
         token.namePrePrefix            = namePrePrefix;
+        token.namePrefixInfo           = namePrefixInfo; // Added by LX
         token.charsetSchema            = charsetSchema;
         token.charsetName              = charsetName;
         token.fullString               = fullString;
@@ -181,10 +184,12 @@ public class Token {
         if (namePrefix != null) {
             if (isDelimitedPrefix) {
                 sb.append('"');
-                sb.append(namePrefix);
+                // sb.append(namePrefix);
+                sb.append(namePrefix+namePrefixInfo);// Added by LX
                 sb.append('"');
             } else {
-                sb.append(namePrefix);
+                // sb.append(namePrefix);
+                sb.append(namePrefix+namePrefixInfo);// Added by LX
             }
 
             sb.append('.');

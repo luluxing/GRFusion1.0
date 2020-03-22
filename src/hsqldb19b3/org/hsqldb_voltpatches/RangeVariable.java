@@ -42,6 +42,7 @@ import org.hsqldb_voltpatches.lib.HashMappedList;
 import org.hsqldb_voltpatches.lib.HashSet;
 import org.hsqldb_voltpatches.lib.HsqlArrayList;
 import org.hsqldb_voltpatches.lib.OrderedHashSet;
+import org.hsqldb_voltpatches.lib.OrderedIntHashSet;// Added by LX
 import org.hsqldb_voltpatches.navigator.RangeIterator;
 import org.hsqldb_voltpatches.navigator.RowIterator;
 import org.hsqldb_voltpatches.persist.PersistentStore;
@@ -56,11 +57,28 @@ import org.hsqldb_voltpatches.types.Type;
  * @since 1.9.0
  */
 final class RangeVariable {
+    // Added by LX
+    private final String c_PROP1 = "PROP1";
+    private final String c_PROP2 = "PROP2";
+    private final String c_PROP3 = "PROP3";
+    private final String c_PROP4 = "PROP4";
+    private final String c_PROP5 = "PROP5";
+    private final String c_LENGTH = "LENGTH";
+    //
 
     static final RangeVariable[] emptyArray = new RangeVariable[]{};
 
     //
     final Table            rangeTable;
+    // Added by LX
+    // GVoltDB extension
+    final GraphView        rangeGraph;
+    final boolean          isGraph;
+    final boolean          isVertexes;
+    final boolean          isEdges;
+    final boolean          isPaths;
+    final String           hint;
+    //
     final SimpleName       tableAlias;
     private OrderedHashSet columnAliases;
     private SimpleName[]   columnAliasNames;
@@ -105,10 +123,16 @@ final class RangeVariable {
         this.variables   = variables;
         this.isVariable  = isVariable;
         rangeTable       = null;
+        rangeGraph       = null;// Added by LX
+        isGraph          = false;// Added by LX
         tableAlias       = null;
         emptyData        = null;
         columnsInGroupBy = null;
         usedColumns      = null;
+        isVertexes       = false;// Added by LX
+        isEdges          = false;// Added by LX
+        isPaths          = false;// Added by LX
+        hint             = null;// Added by LX
     }
 
     RangeVariable(Table table, SimpleName alias, OrderedHashSet columnList,
@@ -122,8 +146,75 @@ final class RangeVariable {
         columnsInGroupBy = rangeTable.getNewColumnCheckList();
         usedColumns      = rangeTable.getNewColumnCheckList();
         rangeIndex       = rangeTable.getPrimaryIndex();
+        // Added by LX
+        isGraph          = false;
+        rangeGraph       = null;
+        isVertexes       = false;
+        isEdges          = false;
+        isPaths          = false;
+        hint             = null;
 
         compileContext.registerRangeVariable(this);
+    }
+
+    // Added by LX
+    RangeVariable(GraphView graph, int type, SimpleName alias, OrderedHashSet columnList, SimpleName[] columnNameList, CompileContext compileContext, String hint) {
+
+          isGraph          = true;
+          
+          if (type == Tokens.VERTEXES) { 
+              isVertexes = true;
+              isEdges = false;
+              isPaths = false;
+          }
+          else if (type == Tokens.EDGES) {
+              isVertexes = false;
+              isEdges = true;
+              isPaths = false;
+          }
+          else if (type == Tokens.PATHS) {
+              isVertexes = false;
+              isEdges = false;
+              isPaths = true;
+          }
+          else {
+              isVertexes = false;
+              isEdges = false;
+              isPaths = false;
+          }
+          
+          rangeGraph       = graph;
+          this.hint        = hint;
+          
+          rangeTable       = null;
+          tableAlias       = alias;
+          columnAliases    = columnList;
+          columnAliasNames = columnNameList;
+          emptyData        = null; //rangeGraph.getEmptyRowData();
+          
+          if (isGraph) {
+              columnsInGroupBy = new boolean[rangeGraph.getAllPropCount()];
+              usedColumns      = new boolean[rangeGraph.getAllPropCount()];
+          }
+          /*if (isVertexes) {
+              columnsInGroupBy = new boolean[rangeGraph.getVertexPropCount()];
+              usedColumns      = new boolean[rangeGraph.getVertexPropCount()];
+          }
+          else if (isEdges) {
+              columnsInGroupBy = new boolean[rangeGraph.getEdgePropCount()];
+              usedColumns      = new boolean[rangeGraph.getEdgePropCount()];          
+          }
+          else if (isPaths) {
+              columnsInGroupBy = new boolean[rangeGraph.getPathPropCount()];
+              usedColumns      = new boolean[rangeGraph.getPathPropCount()];
+          */
+          else { 
+              columnsInGroupBy = null;
+              usedColumns      = null;
+          }
+          rangeIndex       = null;//rangeGraph.getPrimaryIndex();
+        
+          compileContext.registerRangeVariable(this);
     }
 
 /*
@@ -151,6 +242,23 @@ final class RangeVariable {
         rangeIndex       = rangeTable.getPrimaryIndex();
         rangePosition    = range.rangePosition;
         level            = range.level;
+        // Added by LX
+        isGraph          = false;
+        rangeGraph       = null;
+        isVertexes       = false;
+        isEdges          = false;
+        isPaths          = false;
+        hint             = null;
+    }
+
+    // Added by LX
+    Index getIndexForColumns(OrderedIntHashSet set) {
+        if (isGraph) {
+            //  System.out.println("RangeVariable.getIndexForColumns: Indexs for a graph are not supported.");
+            return null;
+        }else {
+            return rangeTable.getIndexForColumns(set);
+        }
     }
 
     void setJoinType(boolean isLeft, boolean isRight) {
@@ -184,6 +292,11 @@ final class RangeVariable {
 
     Table getTable() {
         return rangeTable;
+    }
+
+    // Added by LX
+    GraphView getGraph() {
+        return rangeGraph;
     }
 
     public OrderedHashSet getColumnNames() {
@@ -278,7 +391,47 @@ final class RangeVariable {
         } else if (columnAliases != null) {
             return columnAliases.getIndex(columnName);
         } else {
-            return rangeTable.findColumn(columnName);
+            // Commented by LX
+            // return rangeTable.findColumn(columnName);
+            // Added by LX
+            if (isGraph && isVertexes)
+                return rangeGraph.findVertexProp(columnName);
+            else if (isGraph && isEdges)
+                return rangeGraph.findEdgeProp(columnName);
+            else if (isGraph && isPaths) {
+                //System.out.println("RangeVariable.findColumn() 347 column = " + columnName);
+                return rangeGraph.findPathProp(columnName);
+            }
+            else 
+                return rangeTable.findColumn(columnName);
+        }
+    }
+
+    // Added by LX
+    // TODO merge with findColumn(String tableName, String columnName)
+    public int findColumn(String tableName, String objectName, String columnName) {
+        if (namedJoinColumnExpressions != null
+                && tableName == null
+                && namedJoinColumnExpressions.containsKey(columnName)) {
+            return -1;
+        }
+
+        if (variables != null) {
+            return variables.getIndex(columnName);
+        } else if (columnAliases != null) {
+            return columnAliases.getIndex(columnName);
+        } else {
+            if (objectName.equals(Tokens.getKeyword(Tokens.EDGES)))
+                return rangeGraph.findEdgeProp(columnName);
+            else if (objectName.equals(Tokens.getKeyword(Tokens.VERTEXES)) ||
+                     objectName.equals(Tokens.getKeyword(Tokens.STARTVERTEX)) ||
+                     objectName.equals(Tokens.getKeyword(Tokens.ENDVERTEX))
+                    ) 
+                return rangeGraph.findVertexProp(columnName);
+            else if (objectName.equals(Tokens.getKeyword(Tokens.PATHS)))
+                return rangeGraph.findPathProp(columnName);
+            else  
+                return rangeTable.findColumn(columnName);
         }
     }
 
@@ -295,6 +448,12 @@ final class RangeVariable {
         if (variables != null) {
             return (ColumnSchema) variables.get(i);
         } else {
+            if (isGraph && isVertexes) 
+                return rangeGraph.getVertexProp(i);
+            else if (isGraph && isEdges)
+                return rangeGraph.getEdgeProp(i);
+            else if (isGraph && isPaths)
+                return rangeGraph.getPathProp(i);
             return rangeTable.getColumn(i);
         }
     }
@@ -325,17 +484,39 @@ final class RangeVariable {
             return true;
         }
 
+        // Added by LX
+        String tablename;
+        String schemaname;
+        if (isGraph) { // GVoltDB extension
+            tablename = rangeGraph.GraphName.name;
+            schemaname = rangeGraph.GraphName.schema.name;
+        }
+        else {
+            tablename = rangeTable.tableName.name;
+            schemaname = rangeTable.tableName.schema.name;
+        }
+        
+        //org.voltdb.VLog.GLog("RangeVariable", "resolvesTableName", 3935, 
+        //      " e.columnName = " + e.columnName
+        //    + " e.tableName = "+e.tableName + " tablename = "+tablename
+        //    + " tableAlias.name = "+tableAlias.name
+        //    + " e.schema = "+ e.schema + " schemaname = " + schemaname
+        //    );
+
         if (e.schema == null) {
             if (tableAlias == null) {
-                if (e.tableName.equals(rangeTable.tableName.name)) {
+                // if (e.tableName.equals(rangeTable.tableName.name)) {
+                if (e.tableName.equals(tablename)) { // Added by LX
                     return true;
                 }
             } else if (e.tableName.equals(tableAlias.name)) {
                 return true;
             }
         } else {
-            if (e.tableName.equals(rangeTable.tableName.name)
-                    && e.schema.equals(rangeTable.tableName.schema.name)) {
+            // if (e.tableName.equals(rangeTable.tableName.name)
+                    // && e.schema.equals(rangeTable.tableName.schema.name)) {
+            //Added by LX
+            if (e.tableName.equals(tablename) && e.schema.equals(schemaname)) {
                 return true;
             }
         }
@@ -400,10 +581,48 @@ final class RangeVariable {
                 }
             }
         }
-
-        addTableColumns(exprList, exprList.size(), namedJoinColumns);
+        // Commented by LX
+        // addTableColumns(exprList, exprList.size(), namedJoinColumns);
+        // Added by LX
+        if (!isGraph)
+            addTableColumns(exprList, exprList.size(), namedJoinColumns);
+        // TODO Should we do it?
+        else addGraphAllProps(exprList, exprList.size(), namedJoinColumns);
     }
 
+    // Added by LX
+    private int addGraphAllProps(HsqlArrayList expList, int position, HashSet exclude) {
+
+        GraphView graph = getGraph();
+        int   count = graph.getAllPropCount();
+
+        for (int i = 0; i < count; i++) {
+            ColumnSchema column = null;
+            if (isEdges && graph.isEdge(i)) {
+                column = graph.getEdgeProp(i);
+            }
+            else if (isVertexes && graph.isVertex(i))
+                column = graph.getVertexProp(i);
+            else if (isPaths && graph.isPath(i))
+                column = graph.getPathProp(i);
+            else
+                continue;
+            
+            String columnName = columnAliases == null ? column.getName().name
+                                                      : (String) columnAliases
+                                                          .get(i);
+
+            if (exclude != null && exclude.contains(columnName)) {
+                continue;
+            }
+
+            Expression e = new ExpressionColumn(this, column, i);
+
+            expList.add(position++, e);
+        }
+
+        return position;
+    }
     /**
      * Add all columns to a list of expressions
      */
@@ -1301,8 +1520,193 @@ final class RangeVariable {
         return scan;
     }
 
+    // Added by LX
+    /*
+     * Help function to dig into conditions of the query
+     * used by voltGetGraphRangeVariableXML
+     */
+    void updatescan(VoltXMLElement cond, VoltXMLElement scan) {
+        
+        for (VoltXMLElement c: cond.children) {
+            if (c.attributes.get("optype") == "and")
+                updatescan(c, scan);
+            else if (c.attributes.get("optype") == "equal") {
+                int i = 0;
+                for (VoltXMLElement ccc: c.children) {
+                    if (ccc.attributes.containsKey("column") && 
+                        ccc.attributes.get("column").equals("STARTVERTEXID")) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("startvertexid", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals("ENDVERTEXID")) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("endvertexid", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals(c_PROP1)) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("prop1", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals(c_PROP2)) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("prop2", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals(c_PROP3)) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("prop3", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals(c_PROP4)) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("prop4", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals(c_PROP5)) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("prop5", value.attributes.get("value"));
+                    }
+                    else if (ccc.attributes.containsKey("column") && 
+                             ccc.attributes.get("column").equals(c_LENGTH)) {
+                        VoltXMLElement value = c.children.get(i+1);
+                        scan.attributes.put("length", value.attributes.get("value"));
+                    }
+                    i++;
+                }
+            }
+        }
+    }    
 
+    // Added by LX
+    /**
+     * VoltDB added method to get a non-catalog-dependent
+     * representation of this HSQLDB object.
+     * @param session The current Session object may be needed to resolve
+     * some names.
+     * @return XML, correctly indented, representing this object.
+     * @throws HSQLParseException
+     */
+    VoltXMLElement voltGetGraphRangeVariableXML(Session session)
+    throws org.hsqldb_voltpatches.HSQLInterface.HSQLParseException
+    {
+        Index        index;
+        Index        primaryIndex;
 
+        index        = rangeIndex;
+        primaryIndex = null;//rangeTable.getPrimaryIndex();
+
+        // get the index for this scan (/filter)
+        // note: ignored if scan is full table scan
+        if (index == null)
+            index = primaryIndex;
+
+        // output open tag
+        VoltXMLElement scan;
+        if (isVertexes) 
+            scan = new VoltXMLElement("vertexscan");
+        else if (isEdges)
+            scan = new VoltXMLElement("edgescan");
+        else if (isPaths)
+            scan = new VoltXMLElement("pathscan");
+        else scan = new VoltXMLElement("graphscan");
+
+        scan.attributes.put("graph", rangeGraph.getName().name.toUpperCase());
+
+        if (tableAlias != null && !rangeGraph.getName().name.equals(tableAlias)) {
+            scan.attributes.put("tablealias", tableAlias.name.toUpperCase());
+        }
+
+        // note if this is an outer join
+        if (isLeftJoin && isRightJoin) {
+            scan.attributes.put("jointype", "full");
+        } else if (isLeftJoin) {
+            scan.attributes.put("jointype", "left");
+        } else if (isRightJoin) {
+            scan.attributes.put("jointype", "right");
+        } else {
+            scan.attributes.put("jointype", "inner");
+        }
+
+        Expression joinCond = null;
+        Expression whereCond = null;
+        // if isJoinIndex and indexCondition are set then indexCondition is join condition
+        // else if indexCondition is set then it is where condition
+        if (isJoinIndex == true) {
+            joinCond = indexCondition;
+            if (indexEndCondition != null) {
+                joinCond = makeConjunction(joinCond, indexEndCondition);
+            }
+            // then go to the nonIndexJoinCondition
+            if (nonIndexJoinCondition != null) {
+                joinCond = makeConjunction(joinCond, nonIndexJoinCondition);
+            }
+            // then go to the nonIndexWhereCondition
+            whereCond = nonIndexWhereCondition;
+        } else {
+            joinCond = nonIndexJoinCondition;
+
+            whereCond = indexCondition;
+            if (indexEndCondition != null) {
+                whereCond = makeConjunction(whereCond, indexEndCondition);
+            }
+            // then go to the nonIndexWhereCondition
+            if (nonIndexWhereCondition != null) {
+                whereCond = makeConjunction(whereCond, nonIndexWhereCondition);
+            }
+
+        }
+        
+        if (joinCond != null) {
+            joinCond = joinCond.eliminateDuplicates(session);
+            VoltXMLElement joinCondEl = new VoltXMLElement("joincond");
+            
+            VoltXMLElement cond = joinCond.voltGetXML(session);
+            
+            updatescan(cond, scan);
+            /*
+            for (VoltXMLElement c: cond.children) {
+                //if (c.attributes.get("optype") == "and")
+                    //for (VoltXMLElement cc: c.children) {
+                        //boolean flag = true;
+                        if (c.attributes.get("optype") == "equal") {
+                            int i = 0;
+                            for (VoltXMLElement ccc: c.children) {
+                                if (ccc.attributes.get("column") == "STARTVERTEXID") {
+                                    VoltXMLElement value = c.children.get(i+1);
+                                    scan.attributes.put("startvertexid", value.attributes.get("value"));
+                                    //flag = false;
+                                }
+                                else if (ccc.attributes.get("column") == "ENDVERTEXID") {
+                                    VoltXMLElement value = c.children.get(i+1);
+                                    scan.attributes.put("endvertexid", value.attributes.get("value"));
+                                    //flag = false;
+                                }
+                                i++;
+                            }
+                        }
+                        //if (flag) joinCondEl.children.add(c);
+                    //}
+            }
+            */
+            joinCondEl.children.add(joinCond.voltGetXML(session));
+            scan.children.add(joinCondEl);
+        }
+
+        if (whereCond != null) {
+            whereCond = whereCond.eliminateDuplicates(session);
+            VoltXMLElement whereCondEl = new VoltXMLElement("wherecond");
+            whereCondEl.children.add(whereCond.voltGetXML(session));
+            scan.children.add(whereCondEl);
+        }
+        
+        if (hint != null) scan.attributes.put("hint", hint);        
+        
+        return scan;
+    }    
+
+    // Not in voltdb 6.7 LX
     public int hashCode() {
         final int prime = 31;
         int result = 1;
@@ -1333,6 +1737,7 @@ final class RangeVariable {
         return result;
     }
 
+    // Not in voltdb 6.7 LX
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

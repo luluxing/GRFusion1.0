@@ -835,19 +835,37 @@ public class Scanner {
         }
 
         int i = currentPosition + 1;
+        int PrefInfoLen = 0; // Added by LX
 
         for (; i < limit; i++) {
             char c = sqlString.charAt(i);
 
-            if (c == '_' || Character.isLetterOrDigit(c)) {
+            // if (c == '_' || Character.isLetterOrDigit(c)) {
+
+            // Added by LX
+            if (c == '_' || Character.isLetterOrDigit(c) || c == '[' || c == ']' )// GVoltDB extension to read Edge[0] or Vertex[0]
+            {
+                if (c == '[') { // GVoltDB should handle [0..*] for Vertex/Edge
+                    int j = i;
+                    i++;
+                    for (; i < limit; i++) {
+                        c = sqlString.charAt(i);
+                        if (Character.isDigit(c) || c == '.' || c == '*') continue;
+                        token.namePrefixInfo = sqlString.substring(j, i+1);
+                        PrefInfoLen = token.namePrefixInfo.length(); 
+                        break;
+                    }
+                    
+                }
                 continue;
             }
 
             break;
         }
 
-        token.tokenString = sqlString.substring(currentPosition,
-                i).toUpperCase(Locale.ENGLISH);
+        // token.tokenString = sqlString.substring(currentPosition, i).toUpperCase(Locale.ENGLISH);
+        // Added by LX
+        token.tokenString = sqlString.substring(currentPosition, i-PrefInfoLen).toUpperCase(Locale.ENGLISH);
         currentPosition = i;
 
 /*

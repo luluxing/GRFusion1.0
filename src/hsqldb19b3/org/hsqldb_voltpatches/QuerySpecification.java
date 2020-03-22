@@ -74,6 +74,7 @@ public class QuerySpecification extends QueryExpression {
     public boolean        isDistinctSelect;
     public boolean        isAggregated;
     public boolean        isGrouped;
+    public String         hint; // Added by LX
     private HashSet       groupColumnNames;
     RangeVariable[]       rangeVariables;
     private HsqlArrayList rangeVariableList;
@@ -1783,7 +1784,16 @@ public class QuerySpecification extends QueryExpression {
         }
 
         RangeVariable rangeVar  = rangeVariables[0];
+        // Table         table     = rangeVar.getTable();
+        // Added by LX
+        // TODO Should we update/insert into graph?
+        if (rangeVar.isGraph) {
+            isInsertable = false;
+            isUpdatable  = false;
+            return;
+        }
         Table         table     = rangeVar.getTable();
+
         Table         baseTable = table.getBaseTable();
 
         isInsertable = table.isInsertable();
@@ -2066,6 +2076,11 @@ public class QuerySpecification extends QueryExpression {
     void getBaseTableNames(OrderedHashSet set) {
 
         for (int i = 0; i < rangeVariables.length; i++) {
+            // Added by LX
+            // GVoltDB graph
+            if (rangeVariables[i].isGraph) 
+                continue;
+            
             Table    rangeTable = rangeVariables[i].rangeTable;
             HsqlName name       = rangeTable.getName();
 
