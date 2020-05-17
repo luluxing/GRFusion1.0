@@ -58,7 +58,9 @@ namespace voltdb
     public:
         TupleScanExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node)
             : AbstractExecutor(engine, abstract_node)
-        {}
+        {
+            LogManager::GLog("TupleScanExecutor", "Constructor", 62, abstract_node->debug()); // Add LX
+        }
     protected:
         bool p_init(AbstractPlanNode* abstract_node,
                     const ExecutorVector& executorVector);

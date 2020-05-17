@@ -35,6 +35,11 @@ import org.voltdb.planner.parseinfo.StmtTargetTableScan;
 import org.voltdb.types.PlanNodeType;
 import org.voltdb.types.SortDirectionType;
 
+// Added by LX
+import org.voltdb.catalog.CatalogType;
+import org.voltdb.planner.parseinfo.StmtTargetGraphScan;
+// End LX
+
 public class SeqScanPlanNode extends AbstractScanPlanNode implements ScanPlanNodeWhichCanHaveInlineInsert {
     private Integer m_CTEBaseStmtId;
     private AbstractPlanNode m_CTEBaseNode = null;
@@ -100,7 +105,19 @@ public class SeqScanPlanNode extends AbstractScanPlanNode implements ScanPlanNod
             m_estimatedOutputTupleCount = SUBQUERY_TABLE_ESTIMATES_HACK.minTuples;
             return;
         }
-        Table target = ((StmtTargetTableScan)m_tableScan).getTargetTable();
+        // Commented by LX
+        // Table target = ((StmtTargetTableScan)m_tableScan).getTargetTable();
+        //Table target = ((StmtTargetTableScan)m_tableScan).getTargetTable();
+        // Added by LX
+        CatalogType target = null;
+        if (m_tableScan instanceof StmtTargetTableScan)
+            target = ((StmtTargetTableScan)m_tableScan).getTargetTable();
+        else if (m_tableScan instanceof StmtTargetGraphScan)
+            target = ((StmtTargetGraphScan)m_tableScan).getTargetGraph();
+        assert(target != null);
+        // End LX
+        //Table target = ((StmtTableScan)m_tableScan).getTargetTable();
+        
         TableEstimates tableEstimates = estimates.getEstimatesForTable(target.getTypeName());
         // This maxTuples value estimates the number of tuples fetched from the sequential scan.
         // It's a vague measure of the cost of the scan.

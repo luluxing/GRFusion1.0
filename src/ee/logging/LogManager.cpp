@@ -24,6 +24,17 @@ static pthread_once_t m_keyOnce = PTHREAD_ONCE_INIT;
 
 namespace voltdb {
 
+// Add LX
+bool LogManager::GDebug = false;
+void LogManager::GLog(string className, string methodName, int lineNo, string message)
+{
+	if(LogManager::GDebug)
+	{
+		cout << "#GDebug_EE: " << className << "." << methodName << "(" << lineNo << + ") => " + message << endl;
+	}
+}
+// End LX
+
 static void createThreadLocalKey() {
     (void)pthread_key_create( &m_key, NULL);
 }

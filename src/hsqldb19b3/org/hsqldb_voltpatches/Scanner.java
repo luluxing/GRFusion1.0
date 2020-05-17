@@ -858,6 +858,7 @@ public class Scanner {
                     
                 }
                 continue;
+                // End LX
             }
 
             break;

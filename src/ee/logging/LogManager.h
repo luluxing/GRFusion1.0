@@ -23,7 +23,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <pthread.h>
-
+using namespace std;// Add LX
 
 namespace voltdb {
 
@@ -33,6 +33,10 @@ namespace voltdb {
 class LogManager {
 public:
 
+    // Add LX
+    static bool GDebug;
+    static void GLog(string className, string methodName, int lineNo, string message);
+    // End LX
     /**
      * Constructor that initializes all the loggers with the specified proxy
      * @param proxy The LogProxy that all the loggers should use

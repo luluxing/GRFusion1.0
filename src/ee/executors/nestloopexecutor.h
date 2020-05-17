@@ -59,7 +59,9 @@ class NestLoopExecutor : public AbstractJoinExecutor {
     bool p_execute(const NValueArray &params);
 public:
     NestLoopExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node) :
-        AbstractJoinExecutor(engine, abstract_node) {}
+        AbstractJoinExecutor(engine, abstract_node) {
+        	LogManager::GLog("NestLoopExecutor", "Constructor", 62, abstract_node->debug());// Add LX
+        }
 };
 
 }

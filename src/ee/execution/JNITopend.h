@@ -81,6 +81,8 @@ public:
     int32_t callJavaUserDefinedAggregateCoordinatorEnd();
     void resizeUDFBuffer(int32_t size);
 
+    int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId); // Added by LX
+
 private:
     JNIEnv *m_jniEnv;
 
@@ -112,9 +114,11 @@ private:
     jmethodID m_storeLargeTempTableBlockMID;
     jmethodID m_loadLargeTempTableBlockMID;
     jmethodID m_releaseLargeTempTableBlockMID;
+    jmethodID m_requestDataMID; // Added by LX
     jclass m_exportManagerClass;
     jclass m_partitionDRGatewayClass;
     jclass m_decompressionClass;
+    jclass m_javaExecutionEngineClass; // Added by LX
     jmethodID initJavaUserDefinedMethod(const char* name);
 };
 

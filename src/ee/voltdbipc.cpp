@@ -32,6 +32,8 @@
 #include "execution/VoltDBEngine.h"
 #include "logging/StdoutLogProxy.h"
 #include "storage/table.h"
+#include "storage/persistenttable.h"
+#include "storage/tablefactory.h"
 
 #include "common/debuglog.h"
 #include "common/ElasticHashinator.h"
@@ -229,6 +231,11 @@ private:
     void resizeUDFBuffer(int32_t size) {
         return;
     }
+    // Add LX
+    int invokeRequestData(voltdb::Table* destination, voltdb::Pool *stringPool, long destinationHsId){
+        return 0;
+    }
+    // End LX
 
     void sendException( int8_t errorCode);
 
@@ -1947,7 +1954,7 @@ int main(int argc, char **argv) {
         exit(-2);
     }
 
-    if ((bind(sock, (struct sockaddr*) (&address), sizeof(struct sockaddr_in))) != 0) {
+    if ((::bind(sock, (struct sockaddr*) (&address), sizeof(struct sockaddr_in))) != 0) {
         printf("Failed to bind socket.\n");
         exit(-3);
     }

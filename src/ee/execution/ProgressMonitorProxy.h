@@ -32,8 +32,7 @@ public:
     {
         if (--m_countDown <= 0) {
             m_tuplesRemainingUntilReport =
-                m_executorContext->pushTuplesProcessedForProgressMonitoring(m_limits,
-                                                                            m_tuplesRemainingUntilReport);
+                m_executorContext->pushTuplesProcessedForProgressMonitoring(m_limits, m_tuplesRemainingUntilReport);
             m_countDown = m_tuplesRemainingUntilReport;
         }
     }
@@ -41,8 +40,7 @@ public:
     ~ProgressMonitorProxy()
     {
         // Report progress against next target
-        m_executorContext->pushFinalTuplesProcessedForProgressMonitoring(m_limits,
-                                                                m_tuplesRemainingUntilReport - m_countDown);
+        m_executorContext->pushFinalTuplesProcessedForProgressMonitoring(m_limits, m_tuplesRemainingUntilReport - m_countDown);
     }
 
 private:

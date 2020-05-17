@@ -22,6 +22,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.voltdb.plannodes.*;
+// Added by LX, but they are included in the above, comment this later if needed
+import org.voltdb.plannodes.VertexScanPlanNode;
+import org.voltdb.plannodes.EdgeScanPlanNode;
+import org.voltdb.plannodes.PathScanPlanNode;
+// End LX
 
 /**
  * This is the type of plan nodes.
@@ -36,6 +41,12 @@ public enum PlanNodeType implements PlanMatcher {
     //
     // Scan Nodes
     //
+    // Added by LX
+    PATHSCAN         ( 7, PathScanPlanNode.class),
+    EDGESCAN         ( 8, EdgeScanPlanNode.class),
+    VERTEXSCAN       ( 9, VertexScanPlanNode.class),
+    // End LX
+    
     SEQSCAN          (10, SeqScanPlanNode.class),
     INDEXSCAN        (11, IndexScanPlanNode.class),
     INDEXCOUNT       (12, IndexCountPlanNode.class),

@@ -85,6 +85,7 @@ namespace catalog {
 class Catalog;
 class Database;
 class Table;
+class GraphView; // Add LX
 }
 
 namespace voltdb {
@@ -99,7 +100,9 @@ class ExecutorVector;
 class PersistentTable;
 class StreamedTable;
 class Table;
+class GraphView; // Add LX
 class TableCatalogDelegate;
+class GraphViewCatalogDelegate; // Add LX
 class TempTableLimits;
 class Topend;
 class TheHashinator;
@@ -164,6 +167,10 @@ class __attribute__((visibility("default"))) VoltDBEngine {
             return m_database;
         }
         catalog::Table* getCatalogTable(std::string const& name) const;
+        // Add LX
+        catalog::GraphView* getCatalogGraphView(const std::string& name) const;
+        GraphViewCatalogDelegate* getGraphViewDelegate(const std::string& name) const;
+        // End LX
         Table* getTableById(int32_t tableId) const;
         Table* getTableByName(std::string const& name) const;
         TableCatalogDelegate* getTableDelegate(std::string const& name) const;
@@ -203,6 +210,8 @@ class __attribute__((visibility("default"))) VoltDBEngine {
         int getCurrentIndexInBatch() const {
             return m_currentIndexInBatch;
         }
+
+        int64_t getSiteId(); // Add LX
 
         // -------------------------------------------------
         // Execution Functions
@@ -274,6 +283,13 @@ class __attribute__((visibility("default"))) VoltDBEngine {
         void send(Table* dependency);
 
         int loadNextDependency(Table* destination);
+
+        // Add LX
+        // -------------------------------------------------
+        // Request Data Functions
+        // -------------------------------------------------
+        int invokeRequestData(Table* destination, long destinationHsId);
+        // End LX
 
         // -------------------------------------------------
         // Catalog Functions
@@ -568,6 +584,9 @@ class __attribute__((visibility("default"))) VoltDBEngine {
         void executeTask(TaskType taskType, ReferenceSerializeInputBE& taskInfo);
 
         void rebuildTableCollections(bool updateReplicated = false, bool fromScratch = true);
+
+        void rebuildGraphViewCollections(); // Add LX
+
         void rebuildReplicatedTableCollections() {
             rebuildTableCollections(true);
         }
@@ -702,16 +721,32 @@ class __attribute__((visibility("default"))) VoltDBEngine {
         /*
          * Catalog delegates hashed by path.
          */
+        // LX: key is the table path
         std::map<std::string, TableCatalogDelegate*> m_catalogDelegates;
-
+        // LX: key is the table name
         std::map<std::string, TableCatalogDelegate*> m_delegatesByName;
+        // Add LX
+        //msaber: adding the corresponding collections for the graph views
+        //key is the graph view path
+        std::map<std::string, GraphViewCatalogDelegate*> m_graphViewCatalogDelegates;
+        //key is the graph view name
+        std::map<std::string, GraphViewCatalogDelegate*> m_graphViewDelegatesByName;
+        //End LX
 
         // map catalog table id to table pointers
         std::map<CatalogId, Table*> m_tables;
 
+        // Add LX
+        //msaber: map catalog graphview id to graphview pointers
+        std::map<CatalogId, GraphView*> m_graphViews;
+        // End LX
         // map catalog table name to table pointers
         std::map<std::string, Table*> m_tablesByName;
 
+        // Add LX
+        //msaber: map catalog graphview name to graphview pointers
+        std::map<std::string, GraphView*> m_graphViewsByName;
+        // End LX
         // This maps the function Ids to their corresponding UserDefinedFunctionInfo structures,
         // which stores the parameter types and the return type.
         // The VoltDBEngine will use that information to do correct type casting before handing

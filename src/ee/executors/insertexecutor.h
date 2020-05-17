@@ -63,7 +63,9 @@ class AbstractTempTable;
 class InsertExecutor : public AbstractExecutor {
  public:
      InsertExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node)
-         : AbstractExecutor(engine, abstract_node) { }
+         : AbstractExecutor(engine, abstract_node) { 
+            LogManager::GLog("InsertExecutor", "Constructor", 80, abstract_node->debug());// Add LX
+         }
 
     /**
      * Return false iff all the work is done in init.  Inserting

@@ -124,7 +124,12 @@ map<PlanNodeType, string> const mapOfPlanNodeType {
    {PlanNodeType::MaterializedScan, "MATERIALIZEDSCAN"},
    {PlanNodeType::TupleScan, "TUPLESCAN"},
    {PlanNodeType::WindowFunction, "WINDOWFUNCTION"},
-   {PlanNodeType::CommonTable, "COMMONTABLE"}
+   {PlanNodeType::CommonTable, "COMMONTABLE"},
+   // Added by LX
+   {PlanNodeType::VertexScan, "VERTEXSCAN"},
+   {PlanNodeType::EdgeScan, "EDGESCAN"},
+   {PlanNodeType::PathScan, "PATHSCAN"} // ???
+   // {PlanNodeType::NestedLoopPath, "NESTEDLOOPPATH"} // End LX
 };
 
 map<string, PlanNodeType> const mapToPlanNodeType = revert(mapOfPlanNodeType);

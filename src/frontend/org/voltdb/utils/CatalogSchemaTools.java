@@ -53,6 +53,7 @@ import org.voltdb.catalog.Table;
 import org.voltdb.catalog.Task;
 import org.voltdb.catalog.TaskParameter;
 import org.voltdb.catalog.TimeToLive;
+import org.voltdb.catalog.GraphView; // Add LX
 import org.voltdb.common.Constants;
 import org.voltdb.common.Permission;
 import org.voltdb.compilereport.ProcedureAnnotation;
@@ -83,6 +84,15 @@ public abstract class CatalogSchemaTools {
     private static final String startBatch = "file -inlinebatch END_OF_BATCH\n";
     private static final String endBatch = "END_OF_BATCH\n";
 
+    // Add LX
+    public static void toSchema(StringBuilder sb, GraphView graph) {
+        assert(graph != null);
+        
+        String sql = ((TableAnnotation) graph.getAnnotation()).ddl;
+        sb.append(sql);
+    }
+    // End LX
+
     /**
      * Convert a Table catalog object into the proper SQL DDL, including all indexes,
      * constraints, and foreign key references.
@@ -101,8 +111,7 @@ public abstract class CatalogSchemaTools {
      * @param streamTarget - true if this Table is an Export Table
      * @return SQL Schema text representing the CREATE TABLE statement to generate the table
      */
-    public static String toSchema(StringBuilder sb, Table catalog_tbl, String viewQuery,
-            boolean isExportOnly, String streamPartitionColumn, String streamTarget) {
+    public static String toSchema(StringBuilder sb, Table catalog_tbl, String viewQuery, boolean isExportOnly, String streamPartitionColumn, String streamTarget) {
         assert(!catalog_tbl.getColumns().isEmpty());
         boolean tableIsView = (viewQuery != null);
 

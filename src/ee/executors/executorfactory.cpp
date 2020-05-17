@@ -76,6 +76,12 @@
 #include "executors/unionexecutor.h"
 #include "executors/updateexecutor.h"
 #include "executors/windowfunctionexecutor.h"
+// Add LX
+#include "executors/VertexScanExecutor.h"
+#include "executors/EdgeScanExecutor.h"
+#include "executors/PathScanExecutor.h"
+#include "plannodes/abstractplannode.h"
+// End LX
 
 namespace voltdb {
 
@@ -108,7 +114,8 @@ AbstractExecutor* getNewExecutor(
       case PlanNodeType::MergeReceive:
          return new MergeReceiveExecutor(engine, abstract_node);
       case PlanNodeType::Nestloop:
-         return new NestLoopExecutor(engine, abstract_node);
+         // return new NestedLoopPathExecutor(engine, abstract_node);// Add LX
+         return new NestLoopExecutor(engine, abstract_node); // Comment LX
       case PlanNodeType::NestloopIndex:
          return new NestLoopIndexExecutor(engine, abstract_node);
       case PlanNodeType::MergeJoin:
@@ -141,6 +148,16 @@ AbstractExecutor* getNewExecutor(
          return new UpdateExecutor(engine, abstract_node);
       case PlanNodeType::WindowFunction:
          return new WindowFunctionExecutor(engine, abstract_node);
+      // Add LX
+      case PlanNodeType::VertexScan:
+         return new VertexScanExecutor(engine, abstract_node);
+      case PlanNodeType::EdgeScan:
+         return new EdgeScanExecutor(engine, abstract_node);
+      case PlanNodeType::PathScan:
+         return new PathScanExecutor(engine, abstract_node);
+      // case PlanNodeType::NestedLoopPath:
+      //    return new NestedLoopPathExecutor(engine, abstract_node);
+      // End LX
       case PlanNodeType::Invalid:
          VOLT_ERROR("INVALID plan node type %d", (int) PlanNodeType::Invalid);
          return NULL;

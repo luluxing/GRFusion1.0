@@ -166,6 +166,7 @@ public final class Schema implements SchemaObject {
         // Added by LX
         list.addAll(subList);
         subList = graphviewLookup.getSQL(resolved, unresolved);
+        // End LX
 
         list.addAll(subList);
 
@@ -249,6 +250,7 @@ public final class Schema implements SchemaObject {
             // Added by LX
             case SchemaObject.GRAPHVIEW :
                 return graphviewLookup.map.values().iterator();
+            // End LX
 
             case SchemaObject.CHARSET :
                 return charsetLookup.map.values().iterator();

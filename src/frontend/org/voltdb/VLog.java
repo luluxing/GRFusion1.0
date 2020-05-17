@@ -25,6 +25,16 @@ import java.io.File;
  *
  */
 public class VLog {
+    // Add LX
+    public static boolean GDebug = false;
+    public static void GLog(String className, String methodName, int lineNo, String message)
+    {
+        if(VLog.GDebug)
+        {
+            System.out.println("#GDebug: " + className + "." + methodName + "(" + Integer.toString(lineNo) + ") => " + message);
+        }
+    }
+    // End LX
     static File m_logfile = new File("vlog.txt");
 
     public synchronized static void setPortNo(int portNo) {

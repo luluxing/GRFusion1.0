@@ -408,7 +408,8 @@ public class SchemaManager {
 
         return temp.graphviewList;
     }
-    
+    // End LX
+
     /**
      *  Returns the specified user-defined graph visible within the
      *  context of the specified Session. It excludes any graphs created in other Sessions.
@@ -443,7 +444,7 @@ public class SchemaManager {
         
         return g;
     }
-
+    // End LX
     SchemaObjectSet getSchemaObjectSet(Schema schema, int type) {
 
         SchemaObjectSet set = null;
@@ -463,7 +464,7 @@ public class SchemaManager {
             case SchemaObject.GRAPHVIEW :
                 set = schema.graphviewLookup;
                 break;
-
+            // End LX
             case SchemaObject.CHARSET :
                 set = schema.charsetLookup;
                 break;
@@ -610,7 +611,7 @@ public class SchemaManager {
     public GraphView findSessionGraph(Session session, String name, String schemaName){
         return session.findSessionGraph(name);
     }
-
+    // End LX
     /**
      * Drops the specified user-defined view or table from this Database object.
      *
@@ -929,11 +930,12 @@ public class SchemaManager {
             case SchemaObject.VIEW :
                 // Added by LX
                 // return schema.sequenceLookup.getObject(name);
-                return schema.tableLookup.getObject(name);
+                return schema.tableLookup.getObject(name);// Added by LX
 
             // Added by LX
             case SchemaObject.GRAPHVIEW :
                 return schema.graphviewLookup.getObject(name);
+            // End LX
 
             case SchemaObject.CHARSET :
                 if (name.equals("SQL_IDENTIFIER")) {
@@ -1479,6 +1481,7 @@ public class SchemaManager {
                 set.remove(name.name);
                 break;
             }
+            // End LX
             case SchemaObject.CHARSET :
                 set    = schema.charsetLookup;
                 object = set.getObject(name.name);
@@ -1751,6 +1754,6 @@ public class SchemaManager {
 
         removeSchemaObject(graph.getName(), cascade);
     }
-
+    // End LX
     /**********************************************************************/
 }

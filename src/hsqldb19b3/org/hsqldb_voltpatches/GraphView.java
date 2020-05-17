@@ -1,5 +1,3 @@
-// File copied by LX
-
 package org.hsqldb_voltpatches;
 
 import java.util.ArrayList;

@@ -57,6 +57,7 @@ import org.voltdb.types.ExpressionType;
 import org.voltdb.types.IndexType;
 import org.voltdb.utils.CatalogUtil;
 import org.voltdb.utils.Encoder;
+import org.voltdb.catalog.GraphView; // Add LX
 
 public class MaterializedViewProcessor {
 
@@ -86,7 +87,7 @@ public class MaterializedViewProcessor {
         for (Entry<Table, String> entry : matViewMap.entrySet()) {
             Table destTable = entry.getKey();
             String query = entry.getValue();
-
+            System.out.println(query);
             // get the xml for the query
             VoltXMLElement xmlquery = null;
             try {
@@ -636,8 +637,7 @@ public class MaterializedViewProcessor {
     }
 
     // Compile the fallback query XMLs, add the plans into the catalog statement (ENG-8641).
-    private void compileFallbackQueriesAndUpdateCatalog(Database db, String query, List<VoltXMLElement> fallbackQueryXMLs,
-                                                        MaterializedViewInfo matviewinfo) throws VoltCompilerException {
+    private void compileFallbackQueriesAndUpdateCatalog(Database db, String query, List<VoltXMLElement> fallbackQueryXMLs, MaterializedViewInfo matviewinfo) throws VoltCompilerException {
         DatabaseEstimates estimates = new DatabaseEstimates();
         for (int i=0; i<fallbackQueryXMLs.size(); ++i) {
             String key = String.valueOf(i);
@@ -682,11 +682,7 @@ public class MaterializedViewProcessor {
         }
     }
 
-    private void compileCreateQueryAndUpdateCatalog(Database db,
-                                                    String query,
-                                                    VoltXMLElement xmlquery,
-                                                    MaterializedViewHandlerInfo mvHandlerInfo)
-                                                    throws VoltCompilerException {
+    private void compileCreateQueryAndUpdateCatalog(Database db, String query, VoltXMLElement xmlquery, MaterializedViewHandlerInfo mvHandlerInfo) throws VoltCompilerException {
         DatabaseEstimates estimates = new DatabaseEstimates();
         // Here we are compiling the query twice:
         //   In the first round, we will use inferPartitioning.

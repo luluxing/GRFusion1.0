@@ -71,6 +71,7 @@ class MaterializeExecutor : public AbstractExecutor {
         m_outputTable = NULL;
         m_expressionArray = NULL;
         m_engine = engine;
+        LogManager::GLog("MaterializeExecutor", "Constructor", 75, abstract_node->debug());// Add LX
     }
     ~MaterializeExecutor();
   protected:

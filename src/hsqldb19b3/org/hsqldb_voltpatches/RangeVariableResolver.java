@@ -467,15 +467,18 @@ public class RangeVariableResolver {
         }
 
         boolean isEqual = true;
-        Index   idx = rangeVar.rangeTable.getIndexForColumns(colIndexSetEqual);
+        // Index   idx = rangeVar.rangeTable.getIndexForColumns(colIndexSetEqual); comment LX
+        Index   idx = rangeVar.getIndexForColumns(colIndexSetEqual); // Add LX
 
         if (idx == null) {
             isEqual = false;
-            idx     = rangeVar.rangeTable.getIndexForColumns(colIndexSetOther);
+            // idx     = rangeVar.rangeTable.getIndexForColumns(colIndexSetOther); Comment LX
+            idx     = rangeVar.getIndexForColumns(colIndexSetOther); // Add LX
         }
 
         // different procedure for subquery tables
-        if (idx == null && rangeVar.rangeTable.isSessionBased) {
+        // if (idx == null && rangeVar.rangeTable.isSessionBased) { // comment LX
+        if (idx == null && !rangeVar.isGraph && rangeVar.rangeTable.isSessionBased) { // graph is not supported Add LX
             if (!colIndexSetEqual.isEmpty()) {
                 int[] cols = colIndexSetEqual.toArray();
 

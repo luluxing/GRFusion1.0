@@ -57,6 +57,10 @@ public:
     NestLoopIndexPlanNode() { }
     ~NestLoopIndexPlanNode();
     PlanNodeType getPlanNodeType() const;
+    // Added by LX
+    protected:
+    	void loadFromJSONObject(PlannerDomValue obj);
+    // End LX
 };
 
 } // namespace voltdb

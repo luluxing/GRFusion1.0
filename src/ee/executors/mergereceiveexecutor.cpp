@@ -157,7 +157,9 @@ void MergeReceiveExecutor::merge_sort(const std::vector<TableTuple>& tuples,
 MergeReceiveExecutor::MergeReceiveExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node)
     : AbstractExecutor(engine, abstract_node), m_orderby_node(NULL), m_limit_node(NULL),
     m_agg_exec(NULL)
-{ }
+{ 
+    LogManager::GLog("MergeReceiveExecutor", "Constructor", 173, abstract_node->debug());// Add LX
+}
 
 bool MergeReceiveExecutor::p_init(AbstractPlanNode* abstract_node,
                                   const ExecutorVector& executorVector)

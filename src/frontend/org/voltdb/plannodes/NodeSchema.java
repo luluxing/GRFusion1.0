@@ -139,7 +139,10 @@ public class NodeSchema implements Iterable<SchemaColumn> {
      * @return a list of the columns in this schema.  These columns will be
      * in the order in which they will appear at the output of this node.
      */
-    private List<SchemaColumn> getColumns() {
+    
+    // Modified by LX
+    // private List<SchemaColumn> getColumns() {
+    public List<SchemaColumn> getColumns(){
         return m_columns;
     }
 

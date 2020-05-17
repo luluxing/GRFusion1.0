@@ -123,6 +123,7 @@ SET (VOLTDB_SRC
   catalog/database.cpp
   catalog/function.cpp
   catalog/functionparameter.cpp
+  catalog/graphview.cpp
   catalog/index.cpp
   catalog/indexref.cpp
   catalog/materializedviewhandlerinfo.cpp
@@ -172,6 +173,7 @@ SET (VOLTDB_SRC
   executors/aggregateexecutor.cpp
   executors/commontableexecutor.cpp
   executors/deleteexecutor.cpp
+  executors/EdgeScanExecutor.cpp
   executors/executorfactory.cpp
   executors/executorutil.cpp
   executors/indexcountexecutor.cpp
@@ -187,6 +189,7 @@ SET (VOLTDB_SRC
   executors/nestloopexecutor.cpp
   executors/nestloopindexexecutor.cpp
   executors/orderbyexecutor.cpp
+  executors/PathScanExecutor.cpp
   executors/projectionexecutor.cpp
   executors/receiveexecutor.cpp
   executors/sendexecutor.cpp
@@ -196,6 +199,7 @@ SET (VOLTDB_SRC
   executors/tuplescanexecutor.cpp
   executors/unionexecutor.cpp
   executors/updateexecutor.cpp
+  executors/VertexScanExecutor.cpp
   executors/windowfunctionexecutor.cpp
   expressions/abstractexpression.cpp
   expressions/expressionutil.cpp
@@ -206,6 +210,12 @@ SET (VOLTDB_SRC
   expressions/scalarvalueexpression.cpp
   expressions/subqueryexpression.cpp
   expressions/tupleaddressexpression.cpp
+  graph/Edge.cpp
+  graph/GraphElement.cpp
+  graph/GraphView.cpp
+  graph/GraphViewCatalogDelegate.cpp
+  graph/GraphViewFactory.cpp
+  graph/Vertex.cpp
   indexes/CoveringCellIndex.cpp
   indexes/IndexStats.cpp
   indexes/tableindex.cpp
@@ -221,6 +231,7 @@ SET (VOLTDB_SRC
   plannodes/aggregatenode.cpp
   plannodes/commontablenode.cpp
   plannodes/deletenode.cpp
+  plannodes/EdgeScanNode.cpp
   plannodes/indexcountnode.cpp
   plannodes/indexscannode.cpp
   plannodes/insertnode.cpp
@@ -233,6 +244,7 @@ SET (VOLTDB_SRC
   plannodes/nestloopindexnode.cpp
   plannodes/nestloopnode.cpp
   plannodes/orderbynode.cpp
+  plannodes/PathScanNode.cpp
   plannodes/plannodefragment.cpp
   plannodes/plannodeutil.cpp
   plannodes/projectionnode.cpp
@@ -244,6 +256,7 @@ SET (VOLTDB_SRC
   plannodes/tuplescannode.cpp
   plannodes/unionnode.cpp
   plannodes/updatenode.cpp
+  plannodes/VertexScanNode.cpp
   plannodes/windowfunctionnode.cpp
   stats/StatsAgent.cpp
   stats/StatsSource.cpp

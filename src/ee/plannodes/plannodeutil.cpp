@@ -70,6 +70,12 @@
 #include "plannodes/updatenode.h"
 #include "plannodes/windowfunctionnode.h"
 
+// Added by LX
+#include "plannodes/EdgeScanNode.h"
+#include "plannodes/PathScanNode.h"
+#include "plannodes/VertexScanNode.h"
+#include "plannodes/NestedLoopPathNode.h"
+// End LX
 namespace voltdb {
 namespace plannodeutil {
 
@@ -232,6 +238,32 @@ voltdb::AbstractPlanNode* getEmptyPlanNode(voltdb::PlanNodeType type) {
         case (voltdb::PlanNodeType::CommonTable):
             ret = new voltdb::CommonTablePlanNode();
             break;
+        // Add LX
+        // msaber: VertexScan
+        // ------------------------------------------------------------------
+        case (voltdb::PlanNodeType::VertexScan):
+            ret = new voltdb::VertexScanPlanNode();
+            break;
+            // ------------------------------------------------------------------
+            // msaber: EdgeScan
+            // ------------------------------------------------------------------
+        case (voltdb::PlanNodeType::EdgeScan):
+            ret = new voltdb::EdgeScanPlanNode();
+            break;
+            // ------------------------------------------------------------------
+            // msaber: PathScan
+            // ------------------------------------------------------------------
+        case (voltdb::PlanNodeType::PathScan):
+            ret = new voltdb::PathScanPlanNode();
+            break;
+            
+        // case (voltdb::PlanNodeType::NestedLoopPath):
+        //     ret = new voltdb::NestedLoopPathNode();
+        //     break;
+            // ------------------------------------------------------------------
+            // msaber: PathScan
+            // ------------------------------------------------------------------
+        // End LX
         // default: Don't provide a default, let the compiler enforce complete coverage.
     }
 

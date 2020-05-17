@@ -1843,6 +1843,7 @@ public class Session implements SessionInterface {
     public void setSessiongraphs(GraphView[] graphs) {
         transitionGraphs = graphs;
     }
+    // End LX
 
     public Table findSessionTable(String name) {
 
@@ -1909,7 +1910,7 @@ public class Session implements SessionInterface {
 
         return null;
     }
-
+    // End LX
     public int getResultMemoryRowCount() {
         return resultMaxMemoryRows;
     }

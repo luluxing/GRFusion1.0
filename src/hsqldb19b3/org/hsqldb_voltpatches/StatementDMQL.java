@@ -1241,12 +1241,22 @@ public abstract class StatementDMQL extends Statement {
         voltAppendParameters(session, query, parameters);
 
         // scans
-        VoltXMLElement scans = new VoltXMLElement("tablescans");
+        // VoltXMLElement scans = new VoltXMLElement("tablescans"); comment LX
+        // Add LX
+        VoltXMLElement scans;
+        scans = new VoltXMLElement("tablescans");
+        // End LX
         query.children.add(scans);
         assert(scans != null);
 
         for (RangeVariable rangeVariable : select.rangeVariables) {
-            scans.children.add(rangeVariable.voltGetRangeVariableXML(session));
+            // scans.children.add(rangeVariable.voltGetRangeVariableXML(session)); comment LX
+            // Add LX
+            if (rangeVariable.isGraph)
+                scans.children.add(rangeVariable.voltGetGraphRangeVariableXML(session));
+            else
+                scans.children.add(rangeVariable.voltGetRangeVariableXML(session));
+            // End LX
         }
 
         // groupby

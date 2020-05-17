@@ -41,6 +41,7 @@ import org.voltdb.planner.parseinfo.StmtTableScan;
 import org.voltdb.planner.parseinfo.StmtTargetTableScan;
 import org.voltdb.types.PlanNodeType;
 import org.voltdb.utils.CatalogUtil;
+import org.voltdb.planner.parseinfo.StmtTargetGraphScan; // Added by LX
 
 public abstract class AbstractScanPlanNode extends AbstractPlanNode {
     public enum Members {
@@ -48,7 +49,13 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
         TARGET_TABLE_NAME,
         TARGET_TABLE_ALIAS,
         SUBQUERY_INDICATOR,
-        PREDICATE_FALSE;
+        PREDICATE_FALSE,
+        // Added by LX
+        TARGET_GRAPH_NAME,
+        TARGET_GRAPH_ALIAS,
+        TARGET_OBJECT_NAME,
+        ISGRAPH;
+        // End LX
     }
 
     // Store the columns from the table as an internal NodeSchema
@@ -63,6 +70,10 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
     // The target table is the table that the plannode wants to perform some operation on.
     protected String m_targetTableName = "";
     protected String m_targetTableAlias = null;
+    // Added by LX
+    protected String m_targetObjectName = null;
+    protected boolean isGraph = false;
+    // End LX
 
     // Flag marking the sub-query plan
     protected boolean m_isSubQuery = false;
@@ -78,6 +89,16 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
         m_targetTableName = tableName;
         m_targetTableAlias = tableAlias;
     }
+
+    // Added by LX
+    protected AbstractScanPlanNode(String tableName, String tableAlias, String object) {
+        super();
+        m_targetTableName = tableName;
+        m_targetTableAlias = tableAlias;
+        m_targetObjectName = object;
+        isGraph = true;
+    } 
+    // End LX   
 
     @Override
     public void getTablesAndIndexes(Map<String, StmtTargetTableScan> tablesRead,
@@ -155,6 +176,17 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
         return m_targetTableAlias;
     }
 
+    // Added by LX
+    /**
+     * @param name
+     */
+    public void setTargetObjectName(String name) {
+        assert(name != null);
+        m_targetObjectName = name;
+        isGraph = true;
+    }
+    // End LX
+
     /**
      * @param alias
      */
@@ -168,6 +200,12 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
         setSubQuery(tableScan instanceof StmtSubqueryScan);
         setTargetTableAlias(tableScan.getTableAlias());
         setTargetTableName(tableScan.getTableName());
+
+        // Added by LX
+        if (tableScan instanceof StmtTargetGraphScan)
+            setTargetObjectName(((StmtTargetGraphScan)tableScan).getGraphElementName());
+        // End LX
+
         List<SchemaColumn> scanColumns = tableScan.getScanColumns();
         if (scanColumns != null && ! scanColumns.isEmpty()) {
             setScanColumns(scanColumns);
@@ -277,6 +315,27 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
     public boolean isPersistentTableScan() {
         return (! isCommonTableScan()) && (! isSubQuery());
     }
+
+    // Added by LX
+    /*
+     * GVoltDB
+     * Original VoltDB code, but should be run 3 times for GVoltB 
+     */
+    private void addColsToSchema(CatalogMap<Column> cols, String type) {
+        assert(cols != null);
+        
+        // you don't strictly need to sort this, but it makes diff-ing easier
+        for (Column col : CatalogUtil.getSortedCatalogItems(cols, "index"))
+        {
+            // must produce a tuple value expression for this column.
+            TupleValueExpression tve = new TupleValueExpression(m_targetTableName, m_targetTableAlias, type, col.getTypeName(),  col.getTypeName(), col.getIndex(), -1, -1);
+
+            tve.setTypeSizeAndInBytes(col);
+            // tve.setTypeSizeBytes(col.getType(), col.getSize(), col.getInbytes());
+            m_tableSchema.addColumn(new SchemaColumn(m_targetTableName, m_targetTableAlias, col.getTypeName(), col.getTypeName(), tve, col.getIndex()));
+        }
+    }
+    // End LX
 
     @Override
     public void generateOutputSchema(Database db) {
@@ -393,10 +452,32 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
             }
         } else {
             m_tableSchema = new NodeSchema();
-            CatalogMap<Column> cols =
-                    db.getTables().getExact(m_targetTableName).getColumns();
+            // Commented by LX
+            // CatalogMap<Column> cols = db.getTables().getExact(m_targetTableName).getColumns(); comment LX
+            // Added by LX
+            CatalogMap<Column> cols = null;
+            if (!isGraph)
+                cols = db.getTables().getExact(m_targetTableName).getColumns();
+            else if (m_targetObjectName == "VERTEXES") 
+                cols = db.getGraphviews().getExact(m_targetTableName).getVertexprops();
+            else if (m_targetObjectName == "EDGES")
+                cols = db.getGraphviews().getExact(m_targetTableName).getEdgeprops();
+            else if (m_targetObjectName == "PATHS") {
+                //cols = db.getGraphviews().getExact(m_targetTableName).getVertexprops();
+                //addColsToSchema(cols, "VERTEXES");
+                //cols = db.getGraphviews().getExact(m_targetTableName).getEdgeprops();
+                //addColsToSchema(cols, "EDGES");
+                cols = db.getGraphviews().getExact(m_targetTableName).getPathprops();
+            }
+
+            addColsToSchema(cols, m_targetObjectName);
+            // End LX
+            /*
+            assert(cols != null);
+
             // you don't strictly need to sort this,
             // but it makes diff-ing easier
+            // Commented by LX
             List<Column> sortedCols =
                     CatalogUtil.getSortedCatalogItems(cols, "index");
             for (Column col : sortedCols) {
@@ -408,6 +489,7 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
                         col.getTypeName(), col.getTypeName(),
                         tve, col.getIndex());
             }
+            */
         }
     }
 
@@ -496,8 +578,20 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
             stringer.key(Members.PREDICATE.name());
             stringer.value(m_predicate);
         }
-        stringer.keySymbolValuePair(Members.TARGET_TABLE_NAME.name(), m_targetTableName);
-        stringer.keySymbolValuePair(Members.TARGET_TABLE_ALIAS.name(), m_targetTableAlias);
+
+        // stringer.keySymbolValuePair(Members.TARGET_TABLE_NAME.name(), m_targetTableName); Commented by LX
+        // stringer.keySymbolValuePair(Members.TARGET_TABLE_ALIAS.name(), m_targetTableAlias);Commented by LX
+
+        // Added by LX
+        stringer.keySymbolValuePair(Members.ISGRAPH.name(), String.valueOf(isGraph).toUpperCase());
+        if (!isGraph) {
+            stringer.keySymbolValuePair(Members.TARGET_TABLE_NAME.name(), m_targetTableName);
+            stringer.keySymbolValuePair(Members.TARGET_TABLE_ALIAS.name(), m_targetTableAlias);
+        } else {
+            stringer.keySymbolValuePair(Members.TARGET_GRAPH_NAME.name(), m_targetTableName);
+            stringer.keySymbolValuePair(Members.TARGET_GRAPH_ALIAS.name(), m_targetTableAlias);          
+        }
+        // End LX
         if (m_isSubQuery) {
             stringer.keySymbolValuePair(Members.SUBQUERY_INDICATOR.name(), "TRUE");
         }
@@ -507,8 +601,20 @@ public abstract class AbstractScanPlanNode extends AbstractPlanNode {
     public void loadFromJSONObject( JSONObject jobj, Database db ) throws JSONException {
         helpLoadFromJSONObject(jobj, db);
         m_predicate = AbstractExpression.fromJSONChild(jobj, Members.PREDICATE.name(), m_tableScan);
-        m_targetTableName = jobj.getString( Members.TARGET_TABLE_NAME.name() );
-        m_targetTableAlias = jobj.getString( Members.TARGET_TABLE_ALIAS.name() );
+        // Commented by LX
+        // m_targetTableName = jobj.getString( Members.TARGET_TABLE_NAME.name() );
+        // m_targetTableAlias = jobj.getString( Members.TARGET_TABLE_ALIAS.name() );
+
+        // Added by LX
+        isGraph = Boolean.valueOf( jobj.getString( Members.ISGRAPH.name() ));
+        if (!isGraph) {
+            m_targetTableName = jobj.getString( Members.TARGET_TABLE_NAME.name() );
+            m_targetTableAlias = jobj.getString( Members.TARGET_TABLE_ALIAS.name() );
+        } else {
+            m_targetTableName = jobj.getString( Members.TARGET_GRAPH_NAME.name() );
+            m_targetTableAlias = jobj.getString( Members.TARGET_GRAPH_ALIAS.name() );
+        }
+        // End LX
         if (jobj.has("SUBQUERY_INDICATOR")) {
             m_isSubQuery = "TRUE".equals(jobj.getString( Members.SUBQUERY_INDICATOR.name() ));
         }

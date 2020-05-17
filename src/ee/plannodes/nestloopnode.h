@@ -56,8 +56,12 @@ public:
     NestLoopPlanNode() { }
     ~NestLoopPlanNode();
     PlanNodeType getPlanNodeType() const;
-};
 
+// Added by LX
+protected:
+	void loadFromJSONObject(PlannerDomValue obj);
+};
+// End LX
 } // namespace voltdb
 
 #endif

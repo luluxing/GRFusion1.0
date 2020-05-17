@@ -47,6 +47,10 @@
 
 #include "common/serializeio.h"
 #include "expressions/expressionutil.h"
+// Add LX
+#include "common/types.h"
+#include "logging/LogManager.h"
+// End LX
 
 namespace voltdb {
 
@@ -136,6 +140,7 @@ AbstractExpression::buildExpressionTree(PlannerDomValue obj)
 
     if (exp)
         exp->initParamShortCircuits();
+    LogManager::GLog("AbstractExpression", "buildExpressionTree", 152, exp->debug(true)); // Add LX
     return exp;
 }
 

@@ -74,7 +74,9 @@ class UpdateExecutor : public AbstractExecutor {
     bool p_execute(const NValueArray &params);
 public:
     UpdateExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node)
-        : AbstractExecutor(engine, abstract_node) { }
+        : AbstractExecutor(engine, abstract_node) { 
+            LogManager::GLog("UpdateExecutor", "Constructor", 75, abstract_node->debug());// Add LX
+        }
 };
 
 }

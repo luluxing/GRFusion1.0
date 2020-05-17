@@ -1037,7 +1037,7 @@ public class ParserDQL extends ParserBase {
         
         return null;
     }
-    
+    // End LX
     void XreadFromClause(QuerySpecification select) {
 
         readThis(Tokens.FROM);
@@ -1584,6 +1584,7 @@ public class ParserDQL extends ParserBase {
         boolean        isGraph          = false;
         int            graphtype = -1;
         String         hint      = null;
+        // End LX
 
         if (token.tokenType == Tokens.OPENBRACKET) {
             Expression e = XreadTableSubqueryOrJoinedTable();
@@ -1600,7 +1601,7 @@ public class ParserDQL extends ParserBase {
                 graphtype = token.tokenType;
                 
                 checkIsIdentifier();
-
+                // System.out.println("in parserDQL");
                 graph = database.schemaManager.getGraph(session,
                     token.namePrefix, token.namePrePrefix, token.tokenType);
                 
@@ -1625,6 +1626,7 @@ public class ParserDQL extends ParserBase {
 
 // //                sq.queryExpression = ((View) table).queryExpression;
 //                 table = sq.getTable();
+                // End LX
             }
         }
 
@@ -1636,7 +1638,7 @@ public class ParserDQL extends ParserBase {
 
             hasAs = true;
         }
-
+        // comment LX
         // if (isNonCoreReservedIdentifier()) {
             // boolean limit = token.tokenType == Tokens.LIMIT
                             // || token.tokenType == Tokens.OFFSET;
@@ -1674,7 +1676,9 @@ public class ParserDQL extends ParserBase {
         // }
 
         // RangeVariable range = new RangeVariable(table, alias, columnList, columnNameList, compileContext);
-
+        // End LX
+        // Add LX
+        // System.out.println(token.tokenType);
         if (token.tokenType != Tokens.EDGES) {
         
             if (isNonCoreReservedIdentifier()) {
@@ -1682,8 +1686,7 @@ public class ParserDQL extends ParserBase {
                                 || token.tokenType == Tokens.OFFSET;
                 int position = getPosition();
     
-                alias = HsqlNameManager.getSimpleName(token.tokenString,
-                                                      isDelimitedIdentifier());
+                alias = HsqlNameManager.getSimpleName(token.tokenString, isDelimitedIdentifier());
     
                 read();
                 
@@ -1713,9 +1716,8 @@ public class ParserDQL extends ParserBase {
     
                 for (int i = 0; i < columnList.size(); i++) {
                     SimpleName name =
-                        HsqlNameManager.getSimpleName((String) columnList.get(i),
-                                                      columnNameQuoted.isSet(i));
-    
+                        HsqlNameManager.getSimpleName((String) columnList.get(i), columnNameQuoted.isSet(i));
+                    // System.out.println("dql: " + name.name);
                     columnNameList[i] = name;
                 }
             }
@@ -1723,11 +1725,10 @@ public class ParserDQL extends ParserBase {
     
         RangeVariable range;
         if (isGraph)
-            range = new RangeVariable(graph, graphtype, alias, columnList,
-                    columnNameList, compileContext, hint);
+            range = new RangeVariable(graph, graphtype, alias, columnList, columnNameList, compileContext, hint);
         else
-            range = new RangeVariable(table, alias, columnList,
-                    columnNameList, compileContext);
+            range = new RangeVariable(table, alias, columnList, columnNameList, compileContext);
+        // End LX
         return range;
     }
 
@@ -4315,7 +4316,7 @@ public class ParserDQL extends ParserBase {
         read();
 
         if (token.tokenType != Tokens.OPENBRACKET) {
-            // Expression column = new ExpressionColumn(prePrefix, prefix, name);
+            // Expression column = new ExpressionColumn(prePrefix, prefix, name); comment LX
             // Added by LX
             // TODO 15 Mar 2017 parse IDX of Edge or Vertex and send as parameter 
             Expression column;
@@ -4341,7 +4342,7 @@ public class ParserDQL extends ParserBase {
 
             //org.voltdb.VLog.GLog("ParserDQL", "readColumnOrFunctionExpression", 4012, 
             //      "column = " + column.getColumnName() + " object " + ((ExpressionColumn)column).getObjectName());
-
+            // End LX
             return column;
         }
 

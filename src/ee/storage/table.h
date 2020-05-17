@@ -218,6 +218,17 @@ class Table {
     void loadTuplesFrom(SerializeInputBE& serialInput,
                         Pool* stringPool = NULL);
 
+    // Add LX
+    /**
+     * Loads table from the serialized table.
+     * Used for retrieving data from the frontend.
+     */
+    void loadTable(SerializeInputBE &serialize_in,
+                   Pool *stringPool = NULL,
+                   ReferenceSerializeOutput *uniqueViolationOutput = NULL,
+                   bool shouldDRStreamRows = false);
+    // End LX
+
 
     // ------------------------------------------------------------------
     // EXPORT
@@ -293,6 +304,7 @@ class Table {
 
     bool equals(voltdb::Table* other);
     virtual voltdb::TableStats* getTableStats() = 0;
+    virtual void initializeWithColumns(TupleSchema *schema, const std::vector<std::string> &columnNames, bool ownsTupleSchema, int32_t compactionThreshold = 95); // Add LX
 
     // Return tuple blocks addresses
     virtual std::vector<uint64_t> getBlockAddresses() const = 0;
@@ -333,8 +345,7 @@ protected:
         return unusedTupleCount > actualThreshold;
     }
 
-    virtual void initializeWithColumns(TupleSchema* schema, std::vector<std::string> const& columnNames,
-          bool ownsTupleSchema, int32_t compactionThreshold = 95);
+    // virtual void initializeWithColumns(TupleSchema* schema, std::vector<std::string> const& columnNames, bool ownsTupleSchema, int32_t compactionThreshold = 95); // Comment LX
     bool checkNulls(TableTuple& tuple) const;
 
     // ------------------------------------------------------------------

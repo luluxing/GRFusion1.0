@@ -75,7 +75,11 @@ public abstract class StmtTableScan {
     // references to a <columnname, differentiator> pair in an
     // expression.  We want to add all the columns in the expressions
     // in this scan to the m_scanColumnsList.
-    private final Set<Pair<String, Integer>> m_scanColumnNameSet = new HashSet<>();
+
+    // Commented by LX
+    // private final Set<Pair<String, Integer>> m_scanColumnNameSet = new HashSet<>();
+    // Added by LX
+    protected Set<Pair<String, Integer>> m_scanColumnNameSet = new HashSet<>();
 
     // Partitioning column info
     protected List<SchemaColumn> m_partitioningColumns = null;
@@ -170,7 +174,7 @@ public abstract class StmtTableScan {
         return resolvedExpr;
     }
 
-    private void resolveLeafTve(TupleValueExpression subqTve) {
+    public void resolveLeafTve(TupleValueExpression subqTve) {// private to public by LX
         String columnName = subqTve.getColumnName();
         subqTve.setOrigStmtId(m_stmtId);
         Pair<String, Integer> setItem =

@@ -20,8 +20,7 @@
 
 namespace voltdb {
 
-ProgressMonitorProxy::ProgressMonitorProxy(ExecutorContext* executorContext,
-                                           AbstractExecutor* exec)
+ProgressMonitorProxy::ProgressMonitorProxy(ExecutorContext* executorContext, AbstractExecutor* exec)
     : m_executorContext(executorContext)
     , m_limits(NULL)
     , m_tuplesRemainingUntilReport(

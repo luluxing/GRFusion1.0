@@ -222,7 +222,7 @@ public class StatementSchema extends Statement {
                 group = StatementTypes.X_SQL_SCHEMA_DEFINITION;
                 order = 6;
                 break;
-
+            // End LX
             case StatementTypes.CREATE_USER :
                 group = StatementTypes.X_SQL_SCHEMA_DEFINITION;
                 order = 1;
@@ -601,7 +601,7 @@ public class StatementSchema extends Statement {
                         case StatementTypes.DROP_GRAPHVIEW :
                             dropGraph(session, name, cascade);
                             break;
-
+                        // End LX
                         case StatementTypes.DROP_TRANSFORM :
                         case StatementTypes.DROP_TRANSLATION :
                         case StatementTypes.DROP_CAST :
@@ -643,6 +643,7 @@ public class StatementSchema extends Statement {
                 session.database.schemaManager.addSchemaObject(graph);
                 break;
             }
+            // End LX
             case StatementTypes.GRANT :
             case StatementTypes.REVOKE : {
                 try {
@@ -1083,7 +1084,7 @@ public class StatementSchema extends Statement {
         GraphView graph = session.database.schemaManager.findUserGraph(session, name.name, name.schema.name);
          session.database.schemaManager.dropGraph(session, graph, cascade);
     }
-    
+    // End LX
     private void dropType(Session session, HsqlName name, boolean cascade) {
 
         checkSchemaUpdateAuthorisation(session, name.schema);

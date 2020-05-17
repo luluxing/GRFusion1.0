@@ -92,8 +92,7 @@ public class SQLLexer extends SQLPatternFactory
     private final static String[] MODIFIER_TOKENS = {
         // Commented by LX
         // "assumeunique", "unique", "migrating", "aggregate"
-        // Added by LX
-        "assumeunique", "unique", "directed", "undirected"
+        "assumeunique", "unique", "directed", "undirected"// Added by LX
     };
 
     static final char BLOCK_DELIMITER_CHAR = '#';
@@ -128,12 +127,12 @@ public class SQLLexer extends SQLPatternFactory
             SPF.capture(SPF.tokenAlternatives("create", "drop")),   // DDL commands we're looking for
             // Commented by LX
             // SPF.tokenAlternatives("table", "stream"),               // target is table or stream
-            // Added by LX
-            SPF.tokenAlternatives("table", "stream", "graph"),               // target is table or stream
+            
+            SPF.tokenAlternatives("table", "stream", "graph"),// target is table or stream // Added by LX
             // Commented by LX
             //SPF.optional(SPF.capture(SPF.tokenAlternatives("view"))),   // for "GRAPH VIEW" statement
             // Delete by LX
-            SPF.tokenAlternatives("table", "stream"),               // target is table or stream
+            // SPF.tokenAlternatives("table", "stream"),               // target is table or stream
             SPF.capture(SPF.databaseObjectName())                   // table name (captured)
         ).compile("PAT_TABLE_DDL_PREAMBLE");
 

@@ -19,6 +19,12 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include "StreamPredicateList.h"
+// Added by LX
+#include "expressions/abstractexpression.h"
+#include "common/PlannerDomValue.h"
+#include "logging/LogManager.h"
+#include <limits>
+// End LX
 
 namespace voltdb
 {
@@ -38,6 +44,7 @@ bool StreamPredicateList::parseStrings(
          iter != predicateStrings.end(); ++iter) {
         bool predFailed = false;
         std::string predicateString = *iter;
+        LogManager::GLog("StreamPredicateList", "parseStrings", 44, predicateString); // Added by LX
         if (!predicateString.empty()) {
             try {
                 PlannerDomRoot domRoot((*iter).c_str());

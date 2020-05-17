@@ -301,7 +301,9 @@ SetOperator* SetOperator::getSetOperator(UnionPlanNode* node)
 
 UnionExecutor::UnionExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node)
     : AbstractExecutor(engine, abstract_node)
-{ }
+{ 
+    LogManager::GLog("UnionExecutor", "Constructor", 309, abstract_node->debug()); // Add LX
+}
 
 bool UnionExecutor::p_init(AbstractPlanNode* abstract_node,
                            const ExecutorVector& executorVector)

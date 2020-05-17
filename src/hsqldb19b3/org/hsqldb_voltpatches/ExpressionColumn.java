@@ -64,12 +64,13 @@ public class ExpressionColumn extends Expression {
     String        objectName;
     int           objectIdx = -1; //id of edge/vertex in the ordered list of edges/vertexes in the path,e.g. Edge[0], Vertex[2]
     int           columnIndex0 = -1;
+    // End LX
 
     //
     NumberSequence sequence;
     boolean        isWritable;    // = false; true if column of writable table
 
-    // Added by LX
+    
     /**
      * Creates a OpCodes.COLUMN expression
      */
@@ -79,7 +80,7 @@ public class ExpressionColumn extends Expression {
         tableName   = table;
         columnName  = column;
     }
-
+    // Added by LX
     /**
      * Creates a OpCodes.COLUMN expression
      */
@@ -91,7 +92,7 @@ public class ExpressionColumn extends Expression {
         objectName  = object;
         objectIdx   = objIdx;
     }
-    
+    // End LX
 
     ExpressionColumn(ColumnSchema column) {
         super(OpTypes.COLUMN);
@@ -191,7 +192,7 @@ public class ExpressionColumn extends Expression {
             if (range.isPaths) objectName = "PATHS";
             else if (range.isVertexes) objectName = "VERTEXES";
             else if (range.isEdges) objectName = "EDGES";
-
+        // End LX
         if (alias == null && rangeVariable.hasColumnAliases()) {
             alias = rangeVariable.getColumnAliasName(index);
         }
@@ -329,6 +330,7 @@ public class ExpressionColumn extends Expression {
     String getObjectName() {
         return objectName;
     }
+    // End LX
 
     String getSchemaName() {
         return schema;
@@ -591,15 +593,14 @@ public class ExpressionColumn extends Expression {
             return null;
         }
 
-        // Commented by LX
-        // int colIndex = rangeVar.findColumn(tableName, columnName);
+        // int colIndex = rangeVar.findColumn(tableName, columnName);Commented by LX
         // Added by LX
         int colIndex;
         if (objectName != null) {
             colIndex = rangeVar.findColumn(tableName, objectName, columnName);
         }
         else colIndex = rangeVar.findColumn(tableName, columnName);
-
+        // End LX
         if (colIndex == -1) {
             return null;
         }
@@ -1384,7 +1385,7 @@ public class ExpressionColumn extends Expression {
                 exp.attributes.put("table", tableName.toUpperCase());
             }
         }
-
+        // Add LX
         if (rangeVariable != null && rangeVariable.isGraph) {
             //if (objectName == null)
                 //System.out.println("ExpressionColumn ln 1332: "+columnName);
@@ -1403,7 +1404,7 @@ public class ExpressionColumn extends Expression {
         else exp.attributes.put("propertytype", "column");
         
         if (objectIdx != -1) exp.attributes.put("propertytypeidx", Integer.toString(objectIdx));
-
+        // End LX
         exp.attributes.put("column", columnName.toUpperCase());
         if ((alias == null) || (getAlias().length() == 0)) {
             exp.attributes.put("alias", columnName.toUpperCase());
@@ -1412,7 +1413,7 @@ public class ExpressionColumn extends Expression {
             exp.attributes.put("tablealias",  rangeVariable.tableAlias.name.toUpperCase());
         }
         exp.attributes.put("index", Integer.toString(columnIndex));
-        exp.attributes.put("index0", Integer.toString(columnIndex0));
+        exp.attributes.put("index0", Integer.toString(columnIndex0)); // Add LX
         return exp;
     }
     /**********************************************************************/

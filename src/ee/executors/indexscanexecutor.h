@@ -100,7 +100,9 @@ class IndexScanExecutor : public AbstractExecutor {
     void outputTuple(CountingPostfilter& postfilter, TableTuple& tuple);
 public:
     IndexScanExecutor(VoltDBEngine* engine, AbstractPlanNode* abstractNode)
-        : AbstractExecutor(engine, abstractNode) {}
+        : AbstractExecutor(engine, abstractNode) {
+            LogManager::GLog("IndexScanExecutor", "Constructor", 83, abstractNode->debug());// Add LX
+        }
     ~IndexScanExecutor();
 
     /** This is a helper function to get the "next tuple" during an

@@ -72,7 +72,9 @@ namespace voltdb {
         void outputTuple(TableTuple& tuple);
     public:
         SeqScanExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node)
-            : AbstractExecutor(engine, abstract_node) {}
+            : AbstractExecutor(engine, abstract_node) {
+                LogManager::GLog("SeqScanExecutor", "Constructor", 65, abstract_node->debug()); // Add LX
+            }
     protected:
         bool p_init(AbstractPlanNode* abstract_node,
                     const ExecutorVector& executorVector);

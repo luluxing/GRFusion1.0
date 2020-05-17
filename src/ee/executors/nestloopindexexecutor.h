@@ -79,7 +79,9 @@ protected:
     StandAloneTupleStorage m_indexValues;
 public:
     NestLoopIndexExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node) :
-        AbstractJoinExecutor(engine, abstract_node) {}
+        AbstractJoinExecutor(engine, abstract_node) {
+            LogManager::GLog("NestLoopIndexExecutor", "Constructor", 80, abstract_node->debug());// Add LX
+        }
     ~NestLoopIndexExecutor();
 };
 

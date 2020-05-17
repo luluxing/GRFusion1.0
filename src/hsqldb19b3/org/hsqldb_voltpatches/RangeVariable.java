@@ -64,7 +64,7 @@ final class RangeVariable {
     private final String c_PROP4 = "PROP4";
     private final String c_PROP5 = "PROP5";
     private final String c_LENGTH = "LENGTH";
-    //
+    //End LX
 
     static final RangeVariable[] emptyArray = new RangeVariable[]{};
 
@@ -78,7 +78,7 @@ final class RangeVariable {
     final boolean          isEdges;
     final boolean          isPaths;
     final String           hint;
-    //
+    // End LX
     final SimpleName       tableAlias;
     private OrderedHashSet columnAliases;
     private SimpleName[]   columnAliasNames;
@@ -153,7 +153,7 @@ final class RangeVariable {
         isEdges          = false;
         isPaths          = false;
         hint             = null;
-
+        // End LX
         compileContext.registerRangeVariable(this);
     }
 
@@ -216,7 +216,7 @@ final class RangeVariable {
         
           compileContext.registerRangeVariable(this);
     }
-
+    // End LX
 /*
     RangeVariable(Table table, String alias, OrderedHashSet columnList,
                   Index index, CompileContext compileContext) {
@@ -249,6 +249,7 @@ final class RangeVariable {
         isEdges          = false;
         isPaths          = false;
         hint             = null;
+        // End LX
     }
 
     // Added by LX
@@ -260,7 +261,7 @@ final class RangeVariable {
             return rangeTable.getIndexForColumns(set);
         }
     }
-
+    // End LX
     void setJoinType(boolean isLeft, boolean isRight) {
         isLeftJoin  = isLeft;
         isRightJoin = isRight;
@@ -298,7 +299,7 @@ final class RangeVariable {
     GraphView getGraph() {
         return rangeGraph;
     }
-
+    // End LX
     public OrderedHashSet getColumnNames() {
 
         if (columnNames == null) {
@@ -404,6 +405,7 @@ final class RangeVariable {
             }
             else 
                 return rangeTable.findColumn(columnName);
+            // End LX
         }
     }
 
@@ -434,7 +436,7 @@ final class RangeVariable {
                 return rangeTable.findColumn(columnName);
         }
     }
-
+    // End LX
     ColumnSchema getColumn(String columnName) {
 
         int index = findColumn(columnName);
@@ -448,12 +450,14 @@ final class RangeVariable {
         if (variables != null) {
             return (ColumnSchema) variables.get(i);
         } else {
+            // Add LX
             if (isGraph && isVertexes) 
                 return rangeGraph.getVertexProp(i);
             else if (isGraph && isEdges)
                 return rangeGraph.getEdgeProp(i);
             else if (isGraph && isPaths)
                 return rangeGraph.getPathProp(i);
+            // End LX
             return rangeTable.getColumn(i);
         }
     }
@@ -502,10 +506,10 @@ final class RangeVariable {
         //    + " tableAlias.name = "+tableAlias.name
         //    + " e.schema = "+ e.schema + " schemaname = " + schemaname
         //    );
-
+        // End LX
         if (e.schema == null) {
             if (tableAlias == null) {
-                // if (e.tableName.equals(rangeTable.tableName.name)) {
+                // if (e.tableName.equals(rangeTable.tableName.name)) { comment LX
                 if (e.tableName.equals(tablename)) { // Added by LX
                     return true;
                 }
@@ -514,9 +518,9 @@ final class RangeVariable {
             }
         } else {
             // if (e.tableName.equals(rangeTable.tableName.name)
-                    // && e.schema.equals(rangeTable.tableName.schema.name)) {
-            //Added by LX
-            if (e.tableName.equals(tablename) && e.schema.equals(schemaname)) {
+                    // && e.schema.equals(rangeTable.tableName.schema.name)) { Comment LX
+            
+            if (e.tableName.equals(tablename) && e.schema.equals(schemaname)) { //Added by LX
                 return true;
             }
         }
@@ -588,6 +592,7 @@ final class RangeVariable {
             addTableColumns(exprList, exprList.size(), namedJoinColumns);
         // TODO Should we do it?
         else addGraphAllProps(exprList, exprList.size(), namedJoinColumns);
+        // End LX
     }
 
     // Added by LX
@@ -608,9 +613,7 @@ final class RangeVariable {
             else
                 continue;
             
-            String columnName = columnAliases == null ? column.getName().name
-                                                      : (String) columnAliases
-                                                          .get(i);
+            String columnName = columnAliases == null ? column.getName().name : (String) columnAliases.get(i);
 
             if (exclude != null && exclude.contains(columnName)) {
                 continue;
@@ -623,6 +626,7 @@ final class RangeVariable {
 
         return position;
     }
+    // End LX
     /**
      * Add all columns to a list of expressions
      */
@@ -1578,7 +1582,7 @@ final class RangeVariable {
             }
         }
     }    
-
+    // End LX
     // Added by LX
     /**
      * VoltDB added method to get a non-catalog-dependent
@@ -1588,8 +1592,7 @@ final class RangeVariable {
      * @return XML, correctly indented, representing this object.
      * @throws HSQLParseException
      */
-    VoltXMLElement voltGetGraphRangeVariableXML(Session session)
-    throws org.hsqldb_voltpatches.HSQLInterface.HSQLParseException
+    VoltXMLElement voltGetGraphRangeVariableXML(Session session) throws org.hsqldb_voltpatches.HSQLInterface.HSQLParseException
     {
         Index        index;
         Index        primaryIndex;
@@ -1705,7 +1708,7 @@ final class RangeVariable {
         
         return scan;
     }    
-
+    // End LX
     // Not in voltdb 6.7 LX
     public int hashCode() {
         final int prime = 31;

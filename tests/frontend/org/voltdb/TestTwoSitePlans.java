@@ -127,7 +127,8 @@ public class TestTwoSitePlans extends TestCase {
                                 0,
                                 64*1024,
                                 100,
-                                new HashinatorConfig(configBytes, 0, 0), true));
+                                new HashinatorConfig( configBytes, 0, 0), false, null)); // Add LX
+                                // new HashinatorConfig(configBytes, 0, 0), true));
             }
         }).get();
 
@@ -147,7 +148,8 @@ public class TestTwoSitePlans extends TestCase {
                                 0,
                                 64*1024,
                                 100,
-                                new HashinatorConfig(configBytes, 0, 0), false));
+                                new HashinatorConfig(configBytes, 0, 0), false, null)); // Add LX
+                                // new HashinatorConfig(configBytes, 0, 0), false));
             }
         }).get();
 

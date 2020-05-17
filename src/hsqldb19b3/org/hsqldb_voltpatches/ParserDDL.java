@@ -173,7 +173,7 @@ public class ParserDDL extends ParserRoutine {
                 isGraph   = true;
                 tableType = database.schemaManager.getDefaultTableType();
                 break;
-
+            // End LX
             // A VoltDB extension to support the STREAM alias
             case Tokens.STREAM :
                 read();
@@ -196,10 +196,10 @@ public class ParserDDL extends ParserRoutine {
 
         // Added by LX
         if (isGraph) {
-            System.out.println("graph view");
-            // return compileCreateTable(tableType);// @LuTODO: modify later
+            // System.out.println("graph view");
             return compileCreateGraph(tableType);
         }
+        // End LX
 
         // A VoltDB extension to support the assume unique attribute
         boolean unique = false;
@@ -307,7 +307,7 @@ public class ParserDDL extends ParserRoutine {
         // Add Def Path Properties
         graph.addDefPathProps(schema, isDelimitedIdentifier());
         
-        // Rear ID property
+        // Read ID property
         readThis(Tokens.ID);
         propName = database.nameManager.newColumnHsqlName(schema, "ID", isDelimitedIdentifier());
         props.add(propName);        
@@ -375,7 +375,8 @@ public class ParserDDL extends ParserRoutine {
         
         String partsql = getLastPartAndCurrent(position);
         
-        //System.out.println(partsql);
+        // System.out.println(partsql);
+        // System.out.println("===");
         
         StringBuilder br = new StringBuilder("SELECT ");
         
@@ -385,18 +386,23 @@ public class ParserDDL extends ParserRoutine {
         graph.VTableName = Vtable.getName();
         for (int i = 0; i < props.size(); i++) {
             ColumnSchema column = Vtable.getColumn(Vtable.findColumn(cols.get(i).name)).duplicate();
+
+            // System.out.println(cols.get(i).name);
+            // System.out.println(Vtable.findColumn(cols.get(i).name));
+            
             column.setName(props.get(i));
             graph.addVertexPropNoCheck(column);
             br.append(cols.get(i).name);
             if (i < props.size()-1) br.append(", ");
             else br.append(" ");
+            // System.out.println(br);
         }
         
         graph.addDefVertexProps(schema, isDelimitedIdentifier());
         
         br.append(partsql);
-        
-        //System.out.println(br);
+        // System.out.println(".....");
+        // System.out.println(br);
         
         graph.VSubQuery = br.toString();
         //
@@ -524,7 +530,7 @@ public class ParserDDL extends ParserRoutine {
                                        null, null);
         
     }
-
+    // End LX
     void processAlter() {
 
         session.setScripting(true);
@@ -777,7 +783,7 @@ public class ParserDDL extends ParserRoutine {
                 objectType    = SchemaObject.GRAPHVIEW;
                 canCascade    = false;
                 break;
-                
+            // End LX
             default :
                 throw unexpectedToken();
         }

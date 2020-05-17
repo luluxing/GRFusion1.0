@@ -53,6 +53,7 @@
 #include "common/serializeio.h"
 #include "common/TupleSchema.h"
 #include "common/tabletuple.h"
+#include "common/types.h"
 #include "common/Pool.hpp"
 #include "common/FatalException.hpp"
 #include "indexes/tableindex.h"
@@ -522,4 +523,57 @@ void Table::loadTuplesFrom(SerializeInputBE &serialInput,
     loadTuplesFromNoHeader(serialInput, stringPool);
 }
 
+// Add LX
+void Table::loadTable(SerializeInputBE &serialize_io,
+                      Pool *stringPool,
+                      ReferenceSerializeOutput *uniqueViolationOutput,
+                      bool shouldDRStreamRow) {
+
+    //    rowstart
+    serialize_io.readInt();
+    serialize_io.readByte();
+
+    //    number of columns
+    int16_t colcount = serialize_io.readShort();
+    assert(colcount >= 0);
+
+    // column types
+    vector<ValueType> columnTypes;
+
+    for (int i = 0; i < colcount; ++i) {
+        columnTypes.push_back((ValueType) serialize_io.readEnumInSingleByte());
+    }
+
+    // column names
+    vector<string> columnNames;
+
+    for (int i = 0; i < colcount; ++i) {
+        columnNames.push_back(serialize_io.readTextString());
+    }
+
+    //    extra schema arguments
+    vector<bool> allowNull(colcount, false);
+    vector<bool> columnInBytes(colcount, false);
+
+    vector<int32_t> columnSizes;
+
+    for (int i=0; i<columnTypes.size(); i++) {
+        ValueType type = columnTypes[i];
+
+        switch (type) {
+            case ValueType::tVARCHAR:
+                columnSizes.push_back(20);
+            default:
+                columnSizes.push_back(NValue::getTupleStorageSize(type));
+        }
+    }
+
+    TupleSchema* schema = TupleSchema::createTupleSchema(columnTypes, columnSizes, allowNull, columnInBytes);
+
+    this->initializeWithColumns(schema, columnNames, false, 95);
+
+    loadTuplesFromNoHeader(serialize_io, stringPool);
+
+}
+// End LX
 }

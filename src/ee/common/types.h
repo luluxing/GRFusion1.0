@@ -218,7 +218,14 @@ enum class PlanNodeType {
     Limit            = 56,
     PartialAggregate = 57,
     WindowFunction   = 58,
-    CommonTable      = 59
+    CommonTable      = 59,
+
+    //Added by LX
+    // GRFusion
+    VertexScan       = 70,
+    EdgeScan         = 71,
+    PathScan         = 72
+    // NestedLoopPath   = 73 // End LX
 };
 
 // ------------------------------------------------------------------

@@ -52,6 +52,7 @@ namespace voltdb {
 bool MaterializeExecutor::p_init(AbstractPlanNode* abstractNode,
                                  const ExecutorVector& executorVector)
 {
+    LogManager::GLog("MaterializeExecutor", "p_init", 62, "plan: " + abstractNode->debug(" MySpacer ")); // Add LX
     VOLT_TRACE("init Materialize Executor");
 
     m_node = dynamic_cast<MaterializePlanNode*>(abstractNode);
@@ -89,6 +90,7 @@ bool MaterializeExecutor::p_init(AbstractPlanNode* abstractNode,
 }
 
 bool MaterializeExecutor::p_execute(const NValueArray &params) {
+    LogManager::GLog("MaterializeExecutor", "p_execute", 100, "params: " + params.debug()); // Add LX
     vassert(m_node == dynamic_cast<MaterializePlanNode*>(m_abstractNode));
     vassert(m_node);
     vassert(!m_node->isInline()); // inline projection's execute() should not be called

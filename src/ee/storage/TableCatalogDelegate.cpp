@@ -298,6 +298,7 @@ Table* TableCatalogDelegate::constructTableFromCatalog(catalog::Database const& 
                                                        bool isXDCR,
                                                        int tableAllocationTargetSize,
                                                        bool forceNoDR) {
+    LogManager::GLog("TableCatalogDelegate", "constructTableFromCatalog", 278, "tableName = " + catalogTable.name()); // Add LX
     // get an array of table column names
     const int numColumns = static_cast<int>(catalogTable.columns().size());
     std::map<std::string, catalog::Column*>::const_iterator colIterator;

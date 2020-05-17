@@ -56,6 +56,10 @@ public class VoltDbMessageFactory extends VoltMessageFactory
     final public static byte FLUSH_RO_TXN_MESSAGE_ID = VOLTCORE_MESSAGE_ID_MAX + 30;
     final public static byte START_TASKS_ID = VOLTCORE_MESSAGE_ID_MAX + 31;
     final public static byte HASH_MISMATCH_MESSAGE_ID = VOLTCORE_MESSAGE_ID_MAX + 32;
+    // Add LX
+    final public static byte REQUEST_DATA_ID = VOLTCORE_MESSAGE_ID_MAX + 33;
+    final public static byte REQUEST_DATA_RESPONSE_ID = VOLTCORE_MESSAGE_ID_MAX + 34;
+    // End LX
 
     /**
      * Overridden by subclasses to create message types unknown by voltcore
@@ -162,6 +166,14 @@ public class VoltDbMessageFactory extends VoltMessageFactory
         case HASH_MISMATCH_MESSAGE_ID:
             message = new HashMismatchMessage();
             break;
+        // Add LX
+        case REQUEST_DATA_ID:
+            message = new RequestDataMessage();
+            break;
+        case REQUEST_DATA_RESPONSE_ID:
+            message = new RequestDataResponseMessage();
+            break;
+        // End LX
         default:
             message = null;
         }

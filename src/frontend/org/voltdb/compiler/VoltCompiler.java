@@ -1171,6 +1171,7 @@ public class VoltCompiler {
             addExtraClasses(jarOutput);
 
             compileRowLimitDeleteStmts(db, hsql, ddlcompiler.getLimitDeleteStmtToXmlEntries());
+            // ddlcompiler.PrintCatalog();
         } catch (Throwable ex) {
             ddlcompiler.restoreSavedFunctions();
             throw ex;

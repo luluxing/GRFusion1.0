@@ -37,8 +37,9 @@ public class TestPlansMatView extends PlannerTestCase {
                     "testplansmatview", false);
     }
 
-    public void testPartitionedMatView()
+    public void testPartitionedMatView() throws Exception // throw add by LX
     {
+        setUp(); // Add LX
         List<AbstractPlanNode> pns = compileToFragments("SELECT V_D1 FROM VP WHERE V_PARTKEY = 1;");
         System.out.println(pns.get(0).toExplainPlanString());
         assertEquals(1, pns.size());

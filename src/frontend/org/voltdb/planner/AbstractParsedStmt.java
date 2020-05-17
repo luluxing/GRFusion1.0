@@ -39,6 +39,7 @@ import org.voltdb.catalog.Constraint;
 import org.voltdb.catalog.Database;
 import org.voltdb.catalog.Index;
 import org.voltdb.catalog.Table;
+import org.voltdb.catalog.GraphView; // Add LX
 import org.voltdb.exceptions.PlanningErrorException;
 import org.voltdb.expressions.AbstractExpression;
 import org.voltdb.expressions.AggregateExpression;
@@ -60,6 +61,8 @@ import org.voltdb.planner.parseinfo.StmtCommonTableScanShared;
 import org.voltdb.planner.parseinfo.StmtSubqueryScan;
 import org.voltdb.planner.parseinfo.StmtTableScan;
 import org.voltdb.planner.parseinfo.StmtTargetTableScan;
+import org.voltdb.planner.parseinfo.GraphLeafNode;// Add LX
+import org.voltdb.planner.parseinfo.StmtTargetGraphScan; // Add LX
 import org.voltdb.plannodes.LimitPlanNode;
 import org.voltdb.plannodes.SchemaColumn;
 import org.voltdb.types.ExpressionType;
@@ -94,7 +97,7 @@ public abstract class AbstractParsedStmt {
     public Map<Integer, AbstractExpression> m_parameterTveMap = new HashMap<>();
 
     public List<Table> m_tableList = new ArrayList<>();
-
+    public ArrayList<GraphView> m_graphList = new ArrayList<>(); // Add LX
     private Table m_DDLIndexedTable = null;
 
     public List<AbstractExpression> m_noTableSelectionList = new ArrayList<>();
@@ -299,6 +302,11 @@ public abstract class AbstractParsedStmt {
             } else if (node.name.equalsIgnoreCase("tablescans")) {
                 parseTables(node);
             }
+            // Add LX
+            else if (node.name.equalsIgnoreCase("vertexscan") || node.name.equalsIgnoreCase("edgescan")   || node.name.equalsIgnoreCase("pathscan")   || node.name.equalsIgnoreCase("graphscan")) {
+                parseGraph(node);
+            }
+            // End LX
         }
     }
 
@@ -532,26 +540,53 @@ public abstract class AbstractParsedStmt {
         }
         String columnName = exprNode.attributes.get("column");
         String columnAlias = exprNode.attributes.get("alias");
-
+        System.out.println("---" + columnName + "---");
         // Whether or not this column is the coalesced column produced by a join with a
         // USING predicate.
         String usingAttr = exprNode.attributes.get("using");
         boolean isUsingColumn = Boolean.parseBoolean(usingAttr);
 
+        // Add LX
+        // GVoltDB uses index0 for graphs
+        int idx = Integer.parseInt(exprNode.attributes.get("index"));
+        if (exprNode.attributes.containsKey("index0") && Integer.parseInt(exprNode.attributes.get("index0")) != -1) {
+            idx = Integer.parseInt(exprNode.attributes.get("index0"));
+        }
+        // End LX
+
         // Use the index produced by HSQL as a way to differentiate columns that have
         // the same name with a single table (which can happen for subqueries containing joins).
-        int differentiator = Integer.parseInt(exprNode.attributes.get("index"));
+        // int differentiator = Integer.parseInt(exprNode.attributes.get("index")); comment LX
+        int differentiator = idx; // Add LX
         if (differentiator == -1 && isUsingColumn) {
             for (VoltXMLElement usingElem : exprNode.children) {
                 String usingTableAlias = usingElem.attributes.get("tablealias");
                 if (usingTableAlias != null && usingTableAlias.equals(tableAlias)) {
-                    differentiator = Integer.parseInt(usingElem.attributes.get("index"));
+                    // differentiator = Integer.parseInt(usingElem.attributes.get("index")); comment LX
+                    differentiator = idx; // Add LX
                 }
             }
         }
 
-        TupleValueExpression tve = new TupleValueExpression(tableName, tableAlias,
-                columnName, columnAlias, -1, differentiator);
+        // TupleValueExpression tve = new TupleValueExpression(tableName, tableAlias, columnName, columnAlias, -1, differentiator);  comment LX
+        // Add LX
+        String propertytype = exprNode.attributes.get("propertytype");
+        int objectidx = (exprNode.attributes.get("propertytypeidx") != null) ? 
+                            Integer.parseInt(exprNode.attributes.get("propertytypeidx")) : -1;
+        
+        TupleValueExpression expr;
+        if (propertytype == "vertex" )          
+            expr = new TupleValueExpression(tableName, tableAlias, "VERTEXES",
+                    columnName, columnAlias, -1, differentiator, objectidx);
+        else if (propertytype == "edge" )
+            expr = new TupleValueExpression(tableName, tableAlias, "EDGES",
+                    columnName, columnAlias, -1, differentiator, objectidx);
+        else if (propertytype == "path" || propertytype == "startvertex" || propertytype == "endvertex")
+            expr = new TupleValueExpression(tableName, tableAlias, "PATHS",
+                    columnName, columnAlias, -1, differentiator, objectidx);
+        else 
+            expr = new TupleValueExpression(tableName, tableAlias, columnName, columnAlias, -1, differentiator);
+        // End LX
         // Collect the unique columns used in the plan for a given scan.
 
         // Resolve the tve and add it to the scan's cache of referenced columns
@@ -575,8 +610,21 @@ public abstract class AbstractParsedStmt {
             // from TestVoltCompler.testScalarSubqueriesExpectedFailures.
             throw new PlanningErrorException("Object not found: " + tableAlias);
         }
-        AbstractExpression resolvedExpr = tableScan.resolveTVE(tve);
-
+        
+        // Add LX
+        AbstractExpression resolvedExpr;
+        if (propertytype == "vertex" || propertytype == "edge" || propertytype == "path" || 
+            propertytype == "startvertex" || propertytype == "endvertex")
+        {
+            StmtTargetGraphScan graphScan = (StmtTargetGraphScan)tableScan;
+            resolvedExpr = graphScan.resolveTVE(expr, propertytype);
+            tableScan = (StmtTableScan)graphScan;
+        }   
+        else {
+            resolvedExpr = tableScan.resolveTVE(expr);
+        }
+        // End LX
+        // AbstractExpression resolvedExpr = tableScan.resolveTVE(tve); comment LX
         if (tableScan instanceof StmtCommonTableScan || m_stmtId == tableScan.getStatementId()) {
             return resolvedExpr;
         }
@@ -798,6 +846,24 @@ public abstract class AbstractParsedStmt {
         }
         return tableScan;
     }
+
+    // Add LX
+    /**
+     * Add a table to the statement cache.
+     * @param table
+     * @param tableAlias
+     * @return the cache entry
+     */
+    protected StmtTableScan addGraphToStmtCache(GraphView graph, String tableAlias, String object, String hint, int startvertexid, int endvertexid, int prop1, int prop2, int prop3, int prop4, int prop5, int length) {
+        // Create an index into the query Catalog cache
+        StmtTableScan tableScan = m_tableAliasMap.get(tableAlias);
+        if (tableScan == null) {
+            tableScan = new StmtTargetGraphScan(graph, tableAlias, m_stmtId, object, hint, startvertexid, endvertexid, prop1, prop2, prop3, prop4, prop5, length);
+            m_tableAliasMap.put(tableAlias, tableScan);
+        }
+        return tableScan;
+    }
+    // End LX
 
     /**
      * Add a sub-query to the statement cache.
@@ -1417,6 +1483,102 @@ public abstract class AbstractParsedStmt {
        }
     }
 
+    // Add LX
+    /**
+    *
+    * @param tableNode
+    */
+   private void parseGraph(VoltXMLElement tableNode) {
+       String tableName = tableNode.attributes.get("graph");
+       assert(tableName != null);
+
+       String tableAlias = tableNode.attributes.get("tablealias");
+       if (tableAlias == null) {
+           tableAlias = tableName;
+       }
+       // Hsql rejects name conflicts in a single query
+       m_tableAliasListAsJoinOrder.add(tableAlias);
+
+       // add table to the query cache before processing the JOIN/WHERE expressions
+       // The order is important because processing sub-query expressions assumes that
+       // the sub-query is already registered
+       StmtTableScan graphScan = null;
+       GraphView graph = null;
+       graph = m_db.getGraphviews().getExact(tableName);//getGraphFromDB(tableName);
+       assert(graph != null);
+       m_graphList.add(graph);
+       String object = (tableNode.name == "vertexscan")?"VERTEXES":
+                       (tableNode.name == "edgescan")?"EDGES":
+                       (tableNode.name == "pathscan")?"PATHS":null;
+       
+       String hint = tableNode.attributes.get("hint");
+       int startvertexid = -1;
+       int endvertexid = -1;
+       int prop1 = -1;
+       int prop2 = -1;
+       int prop3 = -1;
+       int prop4 = -1;
+       int prop5 = -1;
+       int length = -1;
+       if (tableNode.attributes.get("startvertexid") != null) {
+           startvertexid = Integer.parseInt(tableNode.attributes.get("startvertexid"));
+       }
+       if (tableNode.attributes.get("endvertexid") != null) {
+           endvertexid = Integer.parseInt(tableNode.attributes.get("endvertexid"));
+       }
+       if (tableNode.attributes.get("prop1") != null) {
+           prop1 = Integer.parseInt(tableNode.attributes.get("prop1"));
+       }
+       if (tableNode.attributes.get("prop2") != null) {
+           prop2 = Integer.parseInt(tableNode.attributes.get("prop2"));
+       }
+       if (tableNode.attributes.get("prop3") != null) {
+           prop3 = Integer.parseInt(tableNode.attributes.get("prop3"));
+       }
+       if (tableNode.attributes.get("prop4") != null) {
+           prop4 = Integer.parseInt(tableNode.attributes.get("prop4"));
+       }
+       if (tableNode.attributes.get("prop5") != null) {
+           prop5 = Integer.parseInt(tableNode.attributes.get("prop5"));
+       }
+       if (tableNode.attributes.get("length") != null) {
+           length = Integer.parseInt(tableNode.attributes.get("length"));
+       }
+       graphScan = addGraphToStmtCache(graph, tableAlias, object, hint, startvertexid, endvertexid,
+                                       prop1, prop2, prop3, prop4, prop5, length);
+
+       AbstractExpression joinExpr = parseJoinCondition(tableNode);
+       AbstractExpression whereExpr = parseWhereCondition(tableNode);
+
+       // The join type of the leaf node is always INNER
+       // For a new tree its node's ids start with 0 and keep incrementing by 1
+       int nodeId = (m_joinTree == null) ? 0 : m_joinTree.getId() + 1;
+
+       JoinNode leafNode;
+       if (graph != null) {
+           leafNode = new GraphLeafNode(nodeId, joinExpr, whereExpr, (StmtTargetGraphScan)graphScan);
+       } else {
+           throw new PlanningErrorException("Graph subquery is not supported");
+           //assert(tableScan instanceof StmtSubqueryScan);
+           //leafNode = new SubqueryLeafNode(nodeId, joinExpr, whereExpr, (StmtSubqueryScan)tableScan);
+           //leafNode.updateContentDeterminismMessage(((StmtSubqueryScan) tableScan).calculateContentDeterminismMessage());
+       }
+
+       if (m_joinTree == null) {
+           // this is the first table
+           m_joinTree = leafNode;
+       } else {
+           // Build the tree by attaching the next table always to the right
+           // The node's join type is determined by the type of its right node
+
+           JoinType joinType = JoinType.get(tableNode.attributes.get("jointype"));
+           assert(joinType != JoinType.INVALID);
+           JoinNode joinNode = new BranchNode(nodeId + 1, joinType, m_joinTree, leafNode);
+           m_joinTree = joinNode;
+      }
+   }
+    // End LX
+
     /**
      * Define a common table by alias.  This happens when a common
      * table is defined in a "from" clause.  For example,
@@ -1505,6 +1667,29 @@ public abstract class AbstractParsedStmt {
                 parseTable(node);
                 visited.add(visitedTable);
             }
+            // Add LX
+            // GVoltDB extension
+            if (node.name.equalsIgnoreCase("graphscan") ||
+                node.name.equalsIgnoreCase("pathscan") ||
+                node.name.equalsIgnoreCase("vertexscan") || 
+                node.name.equalsIgnoreCase("edgescan") 
+                ) {
+
+                String visitedTable = node.attributes.get("tablealias");
+                if (visitedTable == null) {
+                    visitedTable = node.attributes.get("graph");
+                }
+
+                assert(visitedTable != null);
+
+                if( visited.contains(visitedTable)) {
+                    throw new PlanningErrorException("Not unique graph/alias: " + visitedTable);
+                }
+
+                parseGraph(node);
+                visited.add(visitedTable);
+            }
+            // End LX
         }
     }
 
@@ -1632,6 +1817,14 @@ public abstract class AbstractParsedStmt {
             retval.append(sep).append(table.getTypeName());
             sep = ", ";
         }
+        // Add LX
+        retval.append("\nGRAPH SOURCES:\n\t");
+        // retval += "\nGRAPH SOURCES:\n\t";
+        for (GraphView graph : m_graphList) {
+            retval.append(sep).append(graph.getTypeName());
+            sep = ", ";
+        }
+        // End LX
         // Find the common table sources.
         for (String commonTableName : m_tableAliasMap.keySet()) {
             StmtTableScan scan = m_tableAliasMap.get(commonTableName);

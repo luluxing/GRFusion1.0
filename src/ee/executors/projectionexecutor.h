@@ -66,6 +66,7 @@ class ProjectionExecutor : public AbstractExecutor {
     public:
         ProjectionExecutor(VoltDBEngine *engine, AbstractPlanNode* abstract_node) : AbstractExecutor(engine, abstract_node) {
             m_outputTable = NULL;
+            LogManager::GLog("ProjectionExecutor", "Constructor", 69, abstract_node->debug()); // Add LX
         }
         ~ProjectionExecutor();
     protected:

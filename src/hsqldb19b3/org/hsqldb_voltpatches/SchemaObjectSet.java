@@ -324,7 +324,7 @@ public class SchemaObjectSet {
             // Added by LX
             case SchemaObject.GRAPHVIEW :
                 return Tokens.T_GRAPH;
-
+            // End LX
             case SchemaObject.SEQUENCE :
                 return Tokens.T_SEQUENCE;
 

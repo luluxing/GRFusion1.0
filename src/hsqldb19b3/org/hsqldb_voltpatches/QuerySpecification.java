@@ -1793,7 +1793,7 @@ public class QuerySpecification extends QueryExpression {
             return;
         }
         Table         table     = rangeVar.getTable();
-
+        // End LX
         Table         baseTable = table.getBaseTable();
 
         isInsertable = table.isInsertable();
@@ -2080,7 +2080,7 @@ public class QuerySpecification extends QueryExpression {
             // GVoltDB graph
             if (rangeVariables[i].isGraph) 
                 continue;
-            
+            // End LX
             Table    rangeTable = rangeVariables[i].rangeTable;
             HsqlName name       = rangeTable.getName();
 

@@ -624,10 +624,8 @@ public class TestFragmentProgressUpdate extends TestCase {
                 0,
                 64*1024,
                 100,
-                new HashinatorConfig(ElasticHashinator.getConfigureBytes(1),
-                                     0,
-                                     0),
-                true);
+                new HashinatorConfig(ElasticHashinator.getConfigureBytes(1), 0, 0), true, null); // Add LX
+                // new HashinatorConfig(ElasticHashinator.getConfigureBytes(1), 0, 0), true);
     }
 
     @Override

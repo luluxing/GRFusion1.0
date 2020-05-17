@@ -238,7 +238,12 @@ public class HSQLInterface {
         // get old and new XML representations for the affected table
         VoltXMLElement tableXMLNew = null, tableXMLOld = null;
         if (expectedTableAffected != null) {
-            tableXMLNew = getXMLForTable(expectedTableAffected);
+            // tableXMLNew = getXMLForTable(expectedTableAffected); comment LX
+            // Add LX
+            if (stmtInfo.noun == HSQLDDLInfo.Noun.GRAPH)
+                tableXMLNew = getXMLForGraph(expectedTableAffected);
+            else tableXMLNew = getXMLForTable(expectedTableAffected);
+            // End LX
             tableXMLOld = lastSchema.get(expectedTableAffected);
         }
 
@@ -280,6 +285,32 @@ public class HSQLInterface {
         }
         return diff;
     }
+
+    // Add LX
+    /**
+     * Get a serialized XML representation of a particular graph.
+     */
+    private VoltXMLElement getXMLForGraph(String graphName) throws HSQLParseException {
+        VoltXMLElement xml = emptySchema.duplicate();
+
+        // search all the graphs XXX probably could do this non-linearly,
+        //  but i don't know about case-insensitivity yet
+        HashMappedList hsqlGraphs = getHSQLGraphs();
+        for (int i = 0; i < hsqlGraphs.size(); i++) {
+            GraphView graph = (GraphView) hsqlGraphs.get(i);
+            String candidateGraphName = graph.getName().name;
+
+            // found the graph of interest
+            if (candidateGraphName.equalsIgnoreCase(graphName)) {
+                VoltXMLElement vxmle = graph.voltGetGraphXML(sessionProxy);
+                assert(vxmle != null);
+                xml.children.add(vxmle);
+                return xml;
+            }
+        }
+        return null;
+    }
+    // End LX
 
     public VoltXMLElement getLastSchema(String expectedTableAffected) {
         return lastSchema.get(expectedTableAffected);
@@ -606,8 +637,35 @@ public class HSQLInterface {
             xml.children.add(vxmle);
         }
 
+        // Add LX
+        // GVoltDB extension
+        HashMappedList hsqlGraphs = getHSQLGraphs();
+        for (int i = 0; i < hsqlGraphs.size(); i++) {
+            GraphView graph = (GraphView) hsqlGraphs.get(i);
+            VoltXMLElement vxmle = graph.voltGetGraphXML(sessionProxy);
+            assert(vxmle != null);
+            xml.children.add(vxmle);
+        }
+        // GVoltDB
+        // End LX
         return xml;
     }
+
+    // Add LX
+    private HashMappedList getHSQLGraphs() {
+        try {
+            String schemaName = null;
+            schemaName = sessionProxy.getSchemaName(null);
+            SchemaManager schemaManager = sessionProxy.getDatabase().schemaManager;
+            return schemaManager.getGraphs(schemaName);
+        }
+        catch (HsqlException caught) {
+            m_logger.warn("Unexpected error in the SQL parser",
+                    caught);
+            return new HashMappedList();
+        }
+    }
+    // End LX
 
     /**
      * Get a serialized XML representation of a particular table.

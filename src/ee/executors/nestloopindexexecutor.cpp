@@ -129,6 +129,15 @@ bool NestLoopIndexExecutor::p_init(
         p_init_null_tuples(node->getInputTable(), m_indexNode->getTargetTable());
 
         m_indexValues.init(index->getKeySchema());
+        // Add LX
+        std::stringstream paramsToPrint;
+        paramsToPrint << "Input table = " << node->getInputTable()->name() << ", inner table = " << inner_table->name();
+                        //<< ", Join predicate = " << node->getJoinPredicate()->debug(true);
+
+        LogManager::GLog("NestedLoopIndex", "p_init", 160, paramsToPrint.str());
+
+        //Debugging code to understand how nested-loop index works
+        // End LX
         return true;
     }
 }

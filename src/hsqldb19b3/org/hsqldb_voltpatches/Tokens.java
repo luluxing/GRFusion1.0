@@ -1670,7 +1670,8 @@ public class Tokens {
     public static final int PATHS                      = 748;
     public static final int ENDVERTEX                  = 749;
     public static final int STARTVERTEX                = 750;
-    public static final int HINT                         = 751;
+    public static final int HINT                       = 751;
+    // End LX
 
     public static final int X_UNKNOWN_TOKEN = -1;
     private static final IntValueHashMap reservedKeys =

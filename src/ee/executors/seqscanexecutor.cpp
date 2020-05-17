@@ -141,6 +141,11 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
     }
 
     vassert(input_table);
+    LogManager::GLog("SeqScanExecutor", "p_execute", 144,
+                input_table->getColumnNames()[0]);
+    LogManager::GLog("SeqScanExecutor", "p_execute", 144,
+                input_table->getColumnNames()[1]);
+
 
     //* for debug */std::cout << "SeqScanExecutor: node id " << node->getPlanNodeId() <<
     //* for debug */    " input table " << (void*)input_table <<
@@ -164,6 +169,8 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
     ProjectionPlanNode* projectionNode = dynamic_cast<ProjectionPlanNode*>(node->getInlinePlanNode(PlanNodeType::Projection));
     if (projectionNode != NULL) {
         num_of_columns = static_cast<int> (projectionNode->getOutputColumnExpressions().size());
+        LogManager::GLog("SeqScanExecutor", "p_execute", 172, projectionNode->getOutputColumnNames()[0] + 
+            projectionNode->getOutputColumnNames()[1]);
     }
     //
     // OPTIMIZATION: NESTED LIMIT
@@ -199,6 +206,7 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
 
         int limit = CountingPostfilter::NO_LIMIT;
         int offset = CountingPostfilter::NO_OFFSET;
+        LogManager::GLog("SeqScanExecutor", "p_execute:172", offset, "offset");
         if (limit_node) {
             std::tie(limit, offset) = limit_node->getLimitAndOffset(params);
         }
@@ -214,8 +222,7 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
                 inputSchema = projectionNode->getOutputTable()->schema();
             }
             if (m_aggExec != NULL) {
-                temp_tuple = m_aggExec->p_execute_init(params, &pmp,
-                        inputSchema, m_tmpOutputTable, &postfilter);
+                temp_tuple = m_aggExec->p_execute_init(params, &pmp, inputSchema, m_tmpOutputTable, &postfilter);
             }
             else {
                 // We may actually find out during initialization
@@ -248,6 +255,7 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
             }
         }
         else {
+            LogManager::GLog("SeqScanExecutor", "p_execute", 258, "2");
             temp_tuple = m_tmpOutputTable->tempTuple();
         }
 
@@ -261,7 +269,7 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
                        ++tuple_ctr,
                        (int)input_table->activeTupleCount());
             pmp.countdownProgress();
-
+            LogManager::GLog("SeqScanExecutor", "p_execute", 272, tuple.debug(input_table->name()).c_str());
             //
             // For each tuple we need to evaluate it against our predicate and limit/offset
             //
@@ -280,6 +288,7 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
                     for (int ctr = 0; ctr < num_of_columns; ctr++) {
                         NValue value = projectionNode->getOutputColumnExpressions()[ctr]->eval(&tuple, NULL);
                         temp_tuple.setNValue(ctr, value);
+                        LogManager::GLog("SeqScanExecutor", "p_execute", 272, projectionNode->getOutputColumnExpressions()[ctr]->debug(true).c_str());
                     }
                     outputTuple(temp_tuple);
                 }

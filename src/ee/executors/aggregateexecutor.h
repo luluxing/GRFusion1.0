@@ -247,7 +247,9 @@ class AggregateHashExecutor : public AggregateExecutorBase {
     bool p_execute(const NValueArray& params) override;
 public:
     AggregateHashExecutor(VoltDBEngine* engine, AbstractPlanNode* abstract_node) :
-        AggregateExecutorBase(engine, abstract_node) { }
+        AggregateExecutorBase(engine, abstract_node) { 
+            LogManager::GLog("AggregateHashExecutor", "Constructor", 277, abstract_node->debug());// Add LX
+        }
 
     // empty destructor defined in .cpp file because of it is called virtually (not inline)
     // same reason for serial and partial
@@ -282,6 +284,7 @@ protected:
     bool m_noInputRows = true;
     bool m_failPrePredicateOnFirstRow = false;
 
+    // LogManager::GLog("AggregateSerialExecutor", "Constructor", 306, abstract_node->debug()); // Add LX
     TableTuple m_passThroughTupleSource;
 };
 
@@ -295,7 +298,9 @@ class AggregatePartialExecutor : public AggregateExecutorBase {
     void initPartialHashGroupByKeyTuple(const TableTuple& nextTuple);
 public:
     AggregatePartialExecutor(VoltDBEngine* engine, AbstractPlanNode* abstract_node) :
-        AggregateExecutorBase(engine, abstract_node) { }
+        AggregateExecutorBase(engine, abstract_node) { 
+            LogManager::GLog("AggregatePartialExecutor", "Constructor", 366, abstract_node->debug()); // Add LX
+        }
     ~AggregatePartialExecutor();
     TableTuple p_execute_init(const NValueArray& params, ProgressMonitorProxy* pmp,
             const TupleSchema * schema, AbstractTempTable* newTempTable  = nullptr,

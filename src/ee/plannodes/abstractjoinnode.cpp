@@ -107,6 +107,7 @@ std::string AbstractJoinPlanNode::debugInfo(const std::string& spacer) const
     return (buffer.str());
 }
 
+// Commented by LX
 void
 AbstractJoinPlanNode::loadFromJSONObject(PlannerDomValue obj)
 {

@@ -52,6 +52,7 @@
 #include "plannodes/abstractplannode.h"
 #include "storage/AbstractTempTable.hpp"
 #include "common/SynchronizedThreadLock.h"
+#include "logging/LogManager.h" // Add LX
 
 #include <common/debuglog.h>
 #include <vector>
@@ -95,6 +96,16 @@ class AbstractExecutor {
             m_tmpOutputTable->deleteAllTempTuples();
         }
     }
+    
+    // Add LX
+    inline void cleanupInputTempTable(Table * input_table) {
+        AbstractTempTable* tmp_input_table = dynamic_cast<AbstractTempTable*>(input_table);
+        if (tmp_input_table) {
+            // No need of its input temp table
+            tmp_input_table->deleteAllTempTuples();
+        }
+    }
+    // End LX
 
     virtual void cleanupMemoryPool() {
         // LEAVE as blank on purpose

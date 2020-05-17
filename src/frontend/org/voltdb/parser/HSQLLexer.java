@@ -58,7 +58,7 @@ public class HSQLLexer extends SQLPatternFactory
                     SPF.token("on"),
                     SPF.capture("subject", SPF.databaseObjectName())))
         ).compile("HSQL_DDLGRAPH_PREPROCESSOR");
-  
+    // End LX
 
     // Does the ddl statement end with cascade or have if exists in the right place?
     private static final Pattern DDL_IFEXISTS_OR_CASCADE_CHECK =
@@ -84,6 +84,7 @@ public class HSQLLexer extends SQLPatternFactory
         // Added by LX
         Matcher matcher = HSQL_DDLGRAPH_PREPROCESSOR.matcher(ddl);
         boolean found = matcher.find(); 
+        // End LX
         
         // Added by LX
         if (!found) {
@@ -96,6 +97,7 @@ public class HSQLLexer extends SQLPatternFactory
             // Commented by LX
             // Matcher matcher = HSQL_DDL_PREPROCESSOR.matcher(ddl);
             // if (matcher.find()) {
+            // End LX
             String verbString = matcher.group("verb");
             HSQLDDLInfo.Verb verb = HSQLDDLInfo.Verb.get(verbString);
             if (verb == null) {

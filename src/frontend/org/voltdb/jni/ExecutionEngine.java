@@ -48,6 +48,7 @@ import org.voltdb.dr2.DRProtocol;
 import org.voltdb.exceptions.EEException;
 import org.voltdb.iv2.DeterminismHash;
 import org.voltdb.iv2.TxnEgo;
+import org.voltdb.iv2.InitiatorMailbox; // Add LX
 import org.voltdb.largequery.LargeBlockManager;
 import org.voltdb.largequery.LargeBlockResponse;
 import org.voltdb.largequery.LargeBlockTask;
@@ -202,6 +203,8 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
     public long m_lastTuplesAccessed = 0;
     public long m_currMemoryInBytes = 0;
     public long m_peakMemoryInBytes = 0;
+
+    protected InitiatorMailbox m_mailbox; // Add LX
 
     protected UserDefinedFunctionManager m_functionManager = new UserDefinedFunctionManager();
 
@@ -605,6 +608,18 @@ public abstract class ExecutionEngine implements FastDeserializer.Deserializatio
         // get the plan for realz
         return ActivePlanRepository.planForFragmentId(fragmentId);
     }
+
+    // Add LX
+    /**
+     * Request data from other from other cluster nodes.
+     * @param destinationId Host id of the node that holds the data
+     * @return VoltTable serialized in bytes
+     */
+
+    public byte[] requestData(long destinationId) throws InterruptedException {
+        return m_mailbox.requestData(destinationId);
+    }
+    // End LX
 
     /*
      * Interface frontend invokes to communicate to CPP execution engine.
