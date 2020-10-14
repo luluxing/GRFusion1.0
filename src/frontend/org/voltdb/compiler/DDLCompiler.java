@@ -1684,7 +1684,6 @@ public class DDLCompiler {
         graph.setEtable(Etable);
         
         String Vquery  = node.attributes.get("Vquery");
-        // System.out.println("<<<"+Vquery+">>>");
         String Equery  = node.attributes.get("Equery");
         assert(Vquery != null);
         assert(Equery != null);
@@ -1717,7 +1716,7 @@ public class DDLCompiler {
                         addPropertyToCatalog(graph, columnNode, columnTypes,
                                 columnMap, m_compiler, "vertex");
                         // System.out.println("in if");
-                        System.out.println(">>"+columnNode.attributes.get("name")+"<<<");
+                        // System.out.println(">>"+columnNode.attributes.get("name")+"<<<");
                         // System.out.println();
                         colIndex++;
                     }

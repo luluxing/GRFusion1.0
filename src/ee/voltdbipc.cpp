@@ -232,9 +232,9 @@ private:
         return;
     }
     // Add LX
-    int invokeRequestData(voltdb::Table* destination, voltdb::Pool *stringPool, long destinationHsId){
-        return 0;
-    }
+    // int invokeRequestData(voltdb::Table* destination, voltdb::Pool *stringPool, long destinationHsId){
+    //     return 0;
+    // }
     // End LX
 
     void sendException( int8_t errorCode);

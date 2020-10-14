@@ -1083,7 +1083,7 @@ void GraphView::fillGraphFromRelationalTables()
 			}
 		}
 	}
-	LogManager::GLog("GraphView", "fillGraphFromRelationalTables", 159, "graph: " + this->debug());
+	// LogManager::GLog("GraphView", "fillGraphFromRelationalTables", 159, "graph: " + this->debug());
 	//LogManager::GLog("GraphView", "fillGraphFromRelationalTables", 73, "vTable: " + this->m_vertexTable->debug());
 	//LogManager::GLog("GraphView", "fillGraphFromRelationalTables", 73, "eTable: " + this->m_edgeTable->debug());
 

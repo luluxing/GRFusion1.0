@@ -46,6 +46,7 @@ begin Database                       "A set of schema, procedures and other meta
   User*      users                   "The set of users"
   Group*     groups                  "The set of groups"
   Table*     tables                  "The set of Tables for the database"
+  GraphView* graphViews              "The set of graph views in the database"
   Program*   programs                "The set of programs allowed to access this database"
   Procedure* procedures              "The set of stored procedures/transactions for this database"
   Function*  functions               "The set of user-defined functions for this database"
@@ -186,6 +187,20 @@ begin TimeToLive javaonly             "Time to Live (TTL), limits the life span 
   Column? ttlColumn                   "A column used to determine the duration of data"
   int batchSize                       "Number of tuples to be deleted in a batch. default: 1000"
   int maxFrequency                    "Maximal number of times of deleting batchSize rows per second.default: 1"
+end
+
+begin GraphView                              "A graph view in the database"
+  Column* VertexProps                        "The set of properties of the vertex"
+  Column* EdgeProps                          "The set of properties of the edge"
+  Column* PathProps                          "The set of properties of the path"
+  Index* indexes                             "The set of indexes on the columns in the table"
+  Table? VTable                              "The reference of the vertexes table or materialized view (equivalent to materializer in Table)"
+  Table? ETable                              "The reference of the edges table or materialized view (equivalent to materializer in Table)"
+  bool isDirected                            "Is the graph view directed?"
+  bool isreplicated                          "Is the graph view replicated?"
+  int estimatedvertexescount                 "A rough estimate of the number of vertexes in the graph view; used for planning"
+  int estimatededgescount                    "A rough estimate of the number of edges in the graph view; used for planning"
+  string signature                           "Catalog version independent signature of the graph view consisting of name and schema"
 end
 
 begin MaterializedViewHandlerInfo       "Information used to build and update a materialized view"

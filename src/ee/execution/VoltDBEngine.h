@@ -288,7 +288,7 @@ class __attribute__((visibility("default"))) VoltDBEngine {
         // -------------------------------------------------
         // Request Data Functions
         // -------------------------------------------------
-        int invokeRequestData(Table* destination, long destinationHsId);
+        // int invokeRequestData(Table* destination, long destinationHsId);
         // End LX
 
         // -------------------------------------------------

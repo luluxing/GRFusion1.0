@@ -113,14 +113,14 @@ bool VertexScanExecutor::p_execute(const NValueArray &params) {
     Table* input_table = graphView->getVertexTable();
     LogManager::GLog("VertexScanExecutor", "p_execute", 112,
                 input_table->getColumnNames()[0]);
-    LogManager::GLog("VertexScanExecutor", "p_execute", 112,
-                input_table->getColumnNames()[1]);
-    LogManager::GLog("VertexScanExecutor", "p_execute", 112,
-                input_table->getColumnNames()[2]);
-    LogManager::GLog("VertexScanExecutor", "p_execute", 112,
-                input_table->getColumnNames()[3]);
-    LogManager::GLog("VertexScanExecutor", "p_execute", 112,
-                input_table->getColumnNames()[4]);
+    // LogManager::GLog("VertexScanExecutor", "p_execute", 112,
+    //             input_table->getColumnNames()[1]);
+    // LogManager::GLog("VertexScanExecutor", "p_execute", 112,
+    //             input_table->getColumnNames()[2]);
+    // LogManager::GLog("VertexScanExecutor", "p_execute", 112,
+    //             input_table->getColumnNames()[3]);
+    // LogManager::GLog("VertexScanExecutor", "p_execute", 112,
+    //             input_table->getColumnNames()[4]);
     vassert(input_table);
     int vertexId = -1, fanIn = -1, fanOut = -1;
 
@@ -148,9 +148,9 @@ bool VertexScanExecutor::p_execute(const NValueArray &params) {
     ProjectionPlanNode* projectionNode = dynamic_cast<ProjectionPlanNode*>(node->getInlinePlanNode(PlanNodeType::Projection));
     if (projectionNode != NULL) {
         num_of_columns = static_cast<int> (projectionNode->getOutputColumnExpressions().size());
-        LogManager::GLog("VertexScanExecutor", "p_execute", 151, projectionNode->getOutputColumnNames()[0] + projectionNode->getOutputColumnNames()[1]);
+        LogManager::GLog("VertexScanExecutor", "p_execute:151", num_of_columns, "num_of_columns" );
     }
-    LogManager::GLog("VertexScanExecutor", "p_execute:140", num_of_columns, "num_of_columns"  );
+    LogManager::GLog("VertexScanExecutor", "p_execute:153", num_of_columns, "num_of_columns"  );
     //
     // OPTIMIZATION: NESTED LIMIT
     // How nice! We can also cut off our scanning with a nested limit!
@@ -246,6 +246,10 @@ bool VertexScanExecutor::p_execute(const NValueArray &params) {
                     vertexId = ValuePeeker::peekInteger(tuple.getNValue(0));
                     fanOut = graphView->getVertex(vertexId)->fanOut();
                     fanIn = graphView->getVertex(vertexId)->fanIn();
+                    // LX: this is buggy. Hassan assumes that vertexScan always
+                    // return the whole table including fanin and fanout
+                    // so he hard-coded this in the for-loop
+                    // but actually we need to support a more flexible vertexScan
                     for (int ctr = 0; ctr < num_of_columns - 2; ctr++) {
                     	//msaber: todo, need to check the projection operator construction
                     	//and modify it to allow selecting graph vertex attributes

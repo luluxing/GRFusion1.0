@@ -540,7 +540,7 @@ public abstract class AbstractParsedStmt {
         }
         String columnName = exprNode.attributes.get("column");
         String columnAlias = exprNode.attributes.get("alias");
-        System.out.println("---" + columnName + "---");
+        // System.out.println("---" + columnName + "---");
         // Whether or not this column is the coalesced column produced by a join with a
         // USING predicate.
         String usingAttr = exprNode.attributes.get("using");

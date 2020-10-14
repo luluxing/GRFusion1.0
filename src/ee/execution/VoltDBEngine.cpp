@@ -990,9 +990,9 @@ int VoltDBEngine::loadNextDependency(Table* destination) {
 // -------------------------------------------------
 // Request Data Functions
 // -------------------------------------------------
-int VoltDBEngine::invokeRequestData(Table* destination, long destinationHsId) {
-    return m_topend->invokeRequestData(destination, &m_stringPool, destinationHsId);
-}
+// int VoltDBEngine::invokeRequestData(Table* destination, long destinationHsId) {
+//     return m_topend->invokeRequestData(destination, &m_stringPool, destinationHsId);
+// }
 //End LX
 
 // -------------------------------------------------

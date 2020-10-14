@@ -496,7 +496,7 @@ public class TupleValueExpression extends AbstractValueExpression {
         assert(column != null);
         m_tableName = table.getTypeName();
         m_columnIndex = column.getIndex();
-        System.out.println(".." + m_columnName + ".." + m_columnIndex);
+        // System.out.println(".." + m_columnName + ".." + m_columnIndex);
         // System.out.println(m_columnIndex);
         // System.out.println(m_columnName);
         // setTypeSizeAndInBytes(column);

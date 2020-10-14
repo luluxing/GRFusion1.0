@@ -200,9 +200,9 @@ namespace voltdb {
     }
 
     // Added by LX
-    int DummyTopend::invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId) {
-        return 0;
-    }
+    // int DummyTopend::invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId) {
+    //     return 0;
+    // }
     // End LX
 
 } // end namespace voltdb

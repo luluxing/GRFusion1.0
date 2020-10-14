@@ -81,7 +81,7 @@ public:
     int32_t callJavaUserDefinedAggregateCoordinatorEnd();
     void resizeUDFBuffer(int32_t size);
 
-    int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId); // Added by LX
+    // int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId); // Added by LX
 
 private:
     JNIEnv *m_jniEnv;

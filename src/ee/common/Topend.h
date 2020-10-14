@@ -116,7 +116,7 @@ class Topend {
     // The buffer size in the IPC mode is always MAX_MSG_SZ (10M)
     virtual void resizeUDFBuffer(int32_t size) = 0;
 
-    virtual int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId) = 0; // Added by LX
+    // virtual int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId) = 0; // Added by LX
 
     virtual ~Topend()
     {
@@ -173,7 +173,7 @@ public:
     int32_t callJavaUserDefinedAggregateCoordinatorEnd();
     void resizeUDFBuffer(int32_t size);
 
-    int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId); // Added by LX
+    // int invokeRequestData(Table* destination, Pool *stringPool, long destinationHsId); // Added by LX
 
     std::queue<int32_t> partitionIds;
     std::queue<std::string> signatures;

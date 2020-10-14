@@ -509,6 +509,11 @@ public class CatalogDiffEngine {
         {
             return null;
         }
+        // Add LX
+        else if (suspect instanceof GraphView) {
+            return null;
+        }
+        // End LX
         else if (suspect instanceof TimeToLive) {
             Column column = ((TimeToLive) suspect).getTtlcolumn();
             Table table = (Table) column.getParent();

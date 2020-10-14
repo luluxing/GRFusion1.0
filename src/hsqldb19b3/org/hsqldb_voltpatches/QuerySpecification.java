@@ -415,7 +415,7 @@ public class QuerySpecification extends QueryExpression {
                 exprColumnList.remove(pos);
 
                 String tablename = ((ExpressionColumn) e).getTableName();
-
+                // System.out.println("QuerySpecification:418:" + tablename);
                 if (tablename == null) {
                     addAllJoinedColumns(e);
                 } else {
@@ -425,7 +425,7 @@ public class QuerySpecification extends QueryExpression {
                     if (rangeIndex == -1) {
                         throw Error.error(ErrorCode.X_42501, tablename);
                     }
-
+                    // System.out.println("QuerySpecification:428:" + rangeIndex);
                     RangeVariable range   = rangeVariables[rangeIndex];
                     HashSet       exclude = getAllNamedJoinColumns();
 
