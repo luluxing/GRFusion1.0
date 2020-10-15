@@ -110,7 +110,8 @@ public class MpTransactionState extends TransactionState
     final Map<Long, Long> m_masterMapForFragmentRestart = Maps.newHashMap();
 
     //The timeout value for fragment response in minute. default: 5 min
-    private static long PULL_TIMEOUT = Long.valueOf(System.getProperty("MP_TXN_RESPONSE_TIMEOUT", "5")) * 60L;
+    //LX: change the timeout value to be 500min
+    private static long PULL_TIMEOUT = Long.valueOf(System.getProperty("MP_TXN_RESPONSE_TIMEOUT", "500")) * 60L;
 
     MpTransactionState(Mailbox mailbox,
                        TransactionInfoBaseMessage notice,
