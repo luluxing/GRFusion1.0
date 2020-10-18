@@ -224,8 +224,8 @@ enum class PlanNodeType {
     // GRFusion
     VertexScan       = 70,
     EdgeScan         = 71,
-    PathScan         = 72
-    // NestedLoopPath   = 73 // End LX
+    PathScan         = 72,
+    NestedLoopPath   = 73 // End LX
 };
 
 // ------------------------------------------------------------------

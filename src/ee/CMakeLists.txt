@@ -186,6 +186,7 @@ SET (VOLTDB_SRC
   executors/mergereceiveexecutor.cpp
   executors/mergejoinexecutor.cpp
   executors/migrateexecutor.cpp
+  executors/NestedLoopPathExecutor.cpp
   executors/nestloopexecutor.cpp
   executors/nestloopindexexecutor.cpp
   executors/orderbyexecutor.cpp
@@ -241,6 +242,7 @@ SET (VOLTDB_SRC
   plannodes/mergejoinnode.cpp
   plannodes/mergereceivenode.cpp
   plannodes/migratenode.cpp
+  plannodes/NestedLoopPathNode.cpp
   plannodes/nestloopindexnode.cpp
   plannodes/nestloopnode.cpp
   plannodes/orderbynode.cpp

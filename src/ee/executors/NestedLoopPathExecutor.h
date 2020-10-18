@@ -42,6 +42,8 @@ public:
         int startVertexId, endVertexId;
         const string StartVertexLiteral = "STARTVERTEXID";
         const string EndVertexLiteral = "ENDVERTEXID";
+        // LX: find graph is inner or outer table
+        bool isGraphInner;
 };
 
 }

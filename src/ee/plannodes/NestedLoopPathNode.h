@@ -15,8 +15,8 @@ namespace voltdb
 
 class NestedLoopPathNode : public AbstractJoinPlanNode {
 public:
-	NestedLoopPathNode();
-	virtual ~NestedLoopPathNode();
+	NestedLoopPathNode() {};
+	~NestedLoopPathNode();
 	PlanNodeType getPlanNodeType() const;
 
 protected:

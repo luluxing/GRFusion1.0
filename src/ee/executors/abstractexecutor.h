@@ -176,7 +176,7 @@ class AbstractExecutor {
 inline bool AbstractExecutor::execute(const NValueArray& params) {
     AbstractPlanNode *planNode = getPlanNode();
     VOLT_TRACE("Starting execution of plannode(id=%d)...",  planNode->getPlanNodeId());
-
+    LogManager::GLog("AbstractExecutor", "execute", 179, planNode->debug());
     // run the executor
     bool executorSucceeded = p_execute(params);
 

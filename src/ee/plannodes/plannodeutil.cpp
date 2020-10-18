@@ -257,9 +257,9 @@ voltdb::AbstractPlanNode* getEmptyPlanNode(voltdb::PlanNodeType type) {
             ret = new voltdb::PathScanPlanNode();
             break;
             
-        // case (voltdb::PlanNodeType::NestedLoopPath):
-        //     ret = new voltdb::NestedLoopPathNode();
-        //     break;
+        case (voltdb::PlanNodeType::NestedLoopPath):
+            ret = new voltdb::NestedLoopPathNode();
+            break;
             // ------------------------------------------------------------------
             // msaber: PathScan
             // ------------------------------------------------------------------

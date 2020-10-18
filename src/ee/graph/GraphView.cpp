@@ -556,7 +556,7 @@ void GraphView::BFS_Reachability_ByDepth_eSelectivity(int startVertexId, int dep
 					temp_tuple.setNValue(3, ValueFactory::getDoubleValue((double)(outVertex->Level + 1)));
 					//temp_tuple.setNValue(4, ValueFactory::getStringValue("Test", NULL) );
 					if(m_pathTable->activeTupleCount() <= 100)
-					m_pathTable->insertTempTuple(temp_tuple);
+						m_pathTable->insertTempTuple(temp_tuple);
 				}
 				else
 				{
@@ -569,7 +569,8 @@ void GraphView::BFS_Reachability_ByDepth_eSelectivity(int startVertexId, int dep
 
 	std::stringstream paramsToPrint;
 	paramsToPrint << "BFS_ByDepth: from = " << startVertexId << ", depth = " << depth << ", numOfRowsAdded = " << m_pathTable->activeTupleCount();
-	LogManager::GLog("GraphView", "BFS_ByDepth", 463, paramsToPrint.str());
+	
+	LogManager::GLog("GraphView", "BFS_ByDepth", 575, paramsToPrint.str());
 }
 
 void GraphView::BFS_Reachability_ByDepth(int startVertexId, int depth)
@@ -625,6 +626,8 @@ void GraphView::BFS_Reachability_ByDepth(int startVertexId, int depth)
 					//temp_tuple.setNValue(4, ValueFactory::getStringValue("Test", NULL) );
 					if(m_pathTable->activeTupleCount() <= 1000)
 					m_pathTable->insertTempTuple(temp_tuple);
+					LogManager::GLog("GraphView", "BFS_ByDepth", 629, temp_tuple.debug(m_pathTable->name()).c_str());
+
 				}
 				else
 				{
@@ -637,7 +640,7 @@ void GraphView::BFS_Reachability_ByDepth(int startVertexId, int depth)
 
 	std::stringstream paramsToPrint;
 	paramsToPrint << "BFS_ByDepth: from = " << startVertexId << ", depth = " << depth << ", numOfRowsAdded = " << m_pathTable->activeTupleCount();
-	LogManager::GLog("GraphView", "BFS_ByDepth", 463, paramsToPrint.str());
+	LogManager::GLog("GraphView", "BFS_ByDepth", 643, paramsToPrint.str());
 }
 
 void GraphView::BFS_Reachability_ByDestination(int startVertexId, int destVerexId)

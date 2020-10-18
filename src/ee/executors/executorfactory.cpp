@@ -80,6 +80,7 @@
 #include "executors/VertexScanExecutor.h"
 #include "executors/EdgeScanExecutor.h"
 #include "executors/PathScanExecutor.h"
+#include "executors/NestedLoopPathExecutor.h"
 #include "plannodes/abstractplannode.h"
 // End LX
 
@@ -114,8 +115,8 @@ AbstractExecutor* getNewExecutor(
       case PlanNodeType::MergeReceive:
          return new MergeReceiveExecutor(engine, abstract_node);
       case PlanNodeType::Nestloop:
-         // return new NestedLoopPathExecutor(engine, abstract_node);// Add LX
-         return new NestLoopExecutor(engine, abstract_node); // Comment LX
+         return new NestedLoopPathExecutor(engine, abstract_node);// Add LX
+         // return new NestLoopExecutor(engine, abstract_node); // Comment LX
       case PlanNodeType::NestloopIndex:
          return new NestLoopIndexExecutor(engine, abstract_node);
       case PlanNodeType::MergeJoin:
@@ -155,8 +156,8 @@ AbstractExecutor* getNewExecutor(
          return new EdgeScanExecutor(engine, abstract_node);
       case PlanNodeType::PathScan:
          return new PathScanExecutor(engine, abstract_node);
-      // case PlanNodeType::NestedLoopPath:
-      //    return new NestedLoopPathExecutor(engine, abstract_node);
+      case PlanNodeType::NestedLoopPath:
+         return new NestedLoopPathExecutor(engine, abstract_node);
       // End LX
       case PlanNodeType::Invalid:
          VOLT_ERROR("INVALID plan node type %d", (int) PlanNodeType::Invalid);

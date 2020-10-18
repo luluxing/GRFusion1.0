@@ -74,14 +74,24 @@ bool NestedLoopPathExecutor::p_init(AbstractPlanNode* abstractNode, const Execut
     endVertexColumnId = UNDEFINED;
 
     vector<AbstractPlanNode*> children = abstractNode->getChildren();
+    isGraphInner = false;
     if (children.size() == 2)
     {
-    	pathScanNode = dynamic_cast<PathScanPlanNode*>(children[1]);
-
+    	pathScanNode = dynamic_cast<PathScanPlanNode*>(children[0]);
+        // LX: TODO the index for children is hard-coded by Hassan
+        // Need to know which table is from the graph side
     	if (pathScanNode != NULL)
     	{
     		graphView = pathScanNode->getTargetGraphView();
+            isGraphInner = true;
     	}
+        else {
+            // LX: to check whether graph is inner or outer
+            pathScanNode = dynamic_cast<PathScanPlanNode*>(children[1]);
+            if (pathScanNode != NULL) {
+                graphView = pathScanNode->getTargetGraphView();
+            }
+        }
     }
 
     return true;
@@ -107,10 +117,21 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
     // output table must be a temp table
     assert(m_tmpOutputTable);
 
-    Table* outer_table = node->getInputTable();
-    assert(outer_table);
-
-    Table* inner_table = node->getInputTable(1);
+    // LX: TODO this out table and inner table are hard-coded by Hassan?
+    // He assumes that the outer table is the relational table
+    // and the inner table is the one from graph
+    // Need to figure out how VoltDB determines inner and outer
+    Table* outer_table;
+    Table* inner_table;
+    if (isGraphInner) {
+        outer_table = node->getInputTable(1);
+        inner_table = node->getInputTable();
+    }
+    else {
+        outer_table = node->getInputTable();
+        inner_table = node->getInputTable(1);
+    }
+    assert(outer_table);   
     assert(inner_table);
 
     LogManager::GLog("NestedLoopPathExecutor", "p_execute (Outer table)", 117, outer_table->name());
@@ -215,6 +236,7 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
 
         	if (graphView == NULL)
         	{
+                LogManager::GLog("NestedLoopPathExecutor", "p_execute", 222, "inner isn't graph");
 				// By default, the delete as we go flag is false.
 				TableIterator iterator1 = inner_table->iterator();
 				while (postfilter.isUnderLimit() && iterator1.next(inner_tuple)) {
@@ -239,8 +261,8 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
         	}
         	else //the inner is a graph view
         	{
-
-
+                LogManager::GLog("NestedLoopPathExecutor", "p_execute", 246, "inner is graph");
+                LogManager::GLog("NestedLoopPathExecutor", "p_execute", 248, outer_tuple.debug(outer_table->name()).c_str());
         		if (startVertexColumnId != UNDEFINED)
         		{
         			startVertexId = ValuePeeker::peekAsInteger(outer_tuple.getNValue(startVertexColumnId));
@@ -258,23 +280,34 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
 
         		while (postfilter.isUnderLimit() && pathIterator.next(inner_tuple)) {
 					pmp.countdownProgress();
+                    LogManager::GLog("NestedLoopPathExecutor", "p_execute", 281, inner_tuple.debug(inner_table->name()).c_str());
+                    
 					// Apply join filter to produce matches for each outer that has them,
 					// then pad unmatched outers, then filter them all
-					//if (joinPredicate == NULL || joinPredicate->eval(&outer_tuple, &inner_tuple).isTrue())
-					{
-						outerMatch = true;
-						// The inner tuple passed the join predicate
-						if (m_joinType == JOIN_TYPE_FULL) {
-							// Mark it as matched
-							innerTableFilter.updateTuple(inner_tuple, MATCHED_TUPLE);
-						}
-						// Filter the joined tuple
-						if (postfilter.eval(&outer_tuple, &inner_tuple)) {
-							// Matched! Complete the joined tuple with the inner column values.
-							join_tuple.setNValues(outer_cols, inner_tuple, 0, inner_cols);
-							outputTuple(postfilter, join_tuple, pmp);
-						}
+					// if (joinPredicate == NULL || joinPredicate->eval(&outer_tuple, &inner_tuple).isTrue())
+					// {
+					outerMatch = true;
+					// The inner tuple passed the join predicate
+					if (m_joinType == JOIN_TYPE_FULL) {
+						// Mark it as matched
+						innerTableFilter.updateTuple(inner_tuple, MATCHED_TUPLE);
 					}
+					// Filter the joined tuple
+					if (postfilter.eval(&outer_tuple, &inner_tuple)) {
+						// Matched! Complete the joined tuple with the inner column values.
+						// join_tuple.setNValues(outer_cols, inner_tuple, 0, inner_cols);
+                        // Modified by LX: inner and outer are swapped
+                        if (isGraphInner) {
+                            join_tuple.setNValues(inner_cols, outer_tuple, 0, outer_cols);    
+                        }
+                        else {
+                            join_tuple.setNValues(outer_cols, inner_tuple, 0, inner_cols);
+                        }
+                        
+						outputTuple(postfilter, join_tuple, pmp);
+					}
+                    break;   
+					// }
 				} // END INNER WHILE LOOP
 
         	}

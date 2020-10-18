@@ -449,9 +449,12 @@ inline bool TableIterator::next(TableTuple &out) {
     case PERSISTENT:
         return persistentNext(out);
     case LARGE_TEMP:
-    default:
         vassert(m_iteratorType == LARGE_TEMP);
         return largeTempNext(out);
+    default:
+        // vassert(m_iteratorType == LARGE_TEMP);
+        // return largeTempNext(out);
+        return tempNext(out); // modifier by LX
     }
 }
 

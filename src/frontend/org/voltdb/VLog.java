@@ -26,7 +26,7 @@ import java.io.File;
  */
 public class VLog {
     // Add LX
-    public static boolean GDebug = false;
+    public static boolean GDebug = true;
     public static void GLog(String className, String methodName, int lineNo, String message)
     {
         if(VLog.GDebug)

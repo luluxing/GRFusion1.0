@@ -141,10 +141,8 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
     }
 
     vassert(input_table);
-    LogManager::GLog("SeqScanExecutor", "p_execute", 144,
-                input_table->getColumnNames()[0]);
-    LogManager::GLog("SeqScanExecutor", "p_execute", 144,
-                input_table->getColumnNames()[1]);
+    // LogManager::GLog("SeqScanExecutor", "p_execute", 144, input_table->getColumnNames()[0]);
+    // LogManager::GLog("SeqScanExecutor", "p_execute", 144, input_table->getColumnNames()[1]);
 
 
     //* for debug */std::cout << "SeqScanExecutor: node id " << node->getPlanNodeId() <<
@@ -169,8 +167,7 @@ bool SeqScanExecutor::p_execute(const NValueArray &params) {
     ProjectionPlanNode* projectionNode = dynamic_cast<ProjectionPlanNode*>(node->getInlinePlanNode(PlanNodeType::Projection));
     if (projectionNode != NULL) {
         num_of_columns = static_cast<int> (projectionNode->getOutputColumnExpressions().size());
-        LogManager::GLog("SeqScanExecutor", "p_execute", 172, projectionNode->getOutputColumnNames()[0] + 
-            projectionNode->getOutputColumnNames()[1]);
+        // LogManager::GLog("SeqScanExecutor", "p_execute", 172, projectionNode->getOutputColumnNames()[0] + projectionNode->getOutputColumnNames()[1]);
     }
     //
     // OPTIMIZATION: NESTED LIMIT
