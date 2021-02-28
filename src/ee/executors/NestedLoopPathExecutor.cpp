@@ -225,7 +225,12 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
         // populate output table's temp tuple with outer table's values
         // probably have to do this at least once - avoid doing it many
         // times per outer tuple
-        join_tuple.setNValues(0, outer_tuple, 0, outer_cols);
+        if (isGraphInner) {
+            join_tuple.setNValues(inner_cols, outer_tuple, 0, outer_cols);
+        }
+        else {
+            join_tuple.setNValues(0, outer_tuple, 0, outer_cols);
+        }
 
         // did this loop body find at least one match for this tuple?
         bool outerMatch = false;
@@ -280,7 +285,7 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
 
         		while (postfilter.isUnderLimit() && pathIterator.next(inner_tuple)) {
 					pmp.countdownProgress();
-                    LogManager::GLog("NestedLoopPathExecutor", "p_execute", 281, inner_tuple.debug(inner_table->name()).c_str());
+//                    LogManager::GLog("NestedLoopPathExecutor", "p_execute", 281, inner_tuple.debug(inner_table->name()).c_str());
                     
 					// Apply join filter to produce matches for each outer that has them,
 					// then pad unmatched outers, then filter them all
@@ -298,7 +303,7 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
 						// join_tuple.setNValues(outer_cols, inner_tuple, 0, inner_cols);
                         // Modified by LX: inner and outer are swapped
                         if (isGraphInner) {
-                            join_tuple.setNValues(inner_cols, outer_tuple, 0, outer_cols);    
+                            join_tuple.setNValues(0, inner_tuple, 0, inner_cols);
                         }
                         else {
                             join_tuple.setNValues(outer_cols, inner_tuple, 0, inner_cols);
@@ -306,7 +311,7 @@ bool NestedLoopPathExecutor::p_execute(const NValueArray &params) {
                         
 						outputTuple(postfilter, join_tuple, pmp);
 					}
-                    break;   
+//                    break;
 					// }
 				} // END INNER WHILE LOOP
 

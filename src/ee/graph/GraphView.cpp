@@ -606,6 +606,9 @@ void GraphView::BFS_Reachability_ByDepth(int startVertexId, int depth)
 			{
 				outEdge = currentVertex->getOutEdge(i);
 				outVertex = outEdge->getEndVertex();
+                if (outVertex->getId() == currentVertex->getId()) {
+                    outVertex = outEdge->getStartVertex();
+                }
 
 				if (visited.find(outVertex->getId()) != visited.end())
 				{

@@ -25,7 +25,7 @@ static pthread_once_t m_keyOnce = PTHREAD_ONCE_INIT;
 namespace voltdb {
 
 // Add LX
-bool LogManager::GDebug = false;
+bool LogManager::GDebug = true;
 void LogManager::GLog(string className, string methodName, int lineNo, string message)
 {
 	if(LogManager::GDebug)
