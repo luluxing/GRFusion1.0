@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2.7
 # This file is part of VoltDB.
 # Copyright (C) 2008-2020 VoltDB Inc.
 #
